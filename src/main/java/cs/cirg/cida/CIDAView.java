@@ -3,9 +3,11 @@
  */
 package cs.cirg.cida;
 
+import cs.cirg.cida.analysis.MannWhitneyUTest;
 import cs.cirg.cida.components.CIlibOutputReader;
 import cs.cirg.cida.components.SynopsisTableModel;
 import cs.cirg.cida.components.IOBridgeTableModel;
+import cs.cirg.cida.components.SelectionListener;
 import cs.cirg.cida.components.SeriesPair;
 import cs.cirg.cida.experiment.Experiment;
 import cs.cirg.cida.experiment.ExperimentManager;
@@ -35,6 +37,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Real;
@@ -68,6 +71,13 @@ public class CIDAView extends FrameView {
 
     public CIDAView(SingleFrameApplication app) {
         super(app);
+
+        startupDirectory = ((CIDAApplication) app).getStartupDirectory();
+        userSelectedRows = new ArrayList<Integer>();
+        userSelectedColumns = new ArrayList<Integer>();
+        testExperiments = new ArrayList<Experiment>();
+        experimentManager = ExperimentManager.getInstance();
+        analysisName = "";
 
         initComponents();
 
@@ -494,6 +504,19 @@ public class CIDAView extends FrameView {
         }
     }
 
+    @Action
+    public void runMannWhitneyUTest() {
+        MannWhitneyUTest test = new MannWhitneyUTest();
+        for (Experiment experiment : testExperiments) {
+            test.addExperiment(experiment);
+        }
+        test.performTest((String) variablesComboBox.getSelectedItem());
+        DataTable table = test.getResults();
+        IOBridgeTableModel model = new IOBridgeTableModel();
+        model.setDataTable((StandardDataTable<Numeric>) table);
+        testResultsTable.setModel(model);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -520,8 +543,8 @@ public class CIDAView extends FrameView {
         addToAnalysisButton = new javax.swing.JButton();
         addToSynopsisButton = new javax.swing.JButton();
         addAllRowsCheckBox = new javax.swing.JCheckBox();
-        addAllVariablesButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        addAllVariablesAnalysisButton = new javax.swing.JButton();
+        addAllVariablesSynopsisButton = new javax.swing.JButton();
         rawPanel = new javax.swing.JPanel();
         rawPanelToolbar = new javax.swing.JToolBar();
         exportDataButton = new javax.swing.JButton();
@@ -529,9 +552,9 @@ public class CIDAView extends FrameView {
         rawTable = new javax.swing.JTable();
         analysisPanel = new javax.swing.JPanel();
         analysisToolbar = new javax.swing.JToolBar();
-        jButton2 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        plotButton = new javax.swing.JButton();
+        clearAnalysisButton = new javax.swing.JButton();
+        exportAnalysisButton = new javax.swing.JButton();
         analysisScrollPane = new javax.swing.JScrollPane();
         analysisTable = new javax.swing.JTable();
         chartHomePanel = new javax.swing.JPanel();
@@ -588,6 +611,8 @@ public class CIDAView extends FrameView {
         experimentsLabel.setText(resourceMap.getString("experimentsLabel.text")); // NOI18N
         experimentsLabel.setName("experimentsLabel"); // NOI18N
 
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(cs.cirg.cida.CIDAApplication.class).getContext().getActionMap(CIDAView.class, this);
+        loadExperimentButton.setAction(actionMap.get("loadExperiment")); // NOI18N
         loadExperimentButton.setText(resourceMap.getString("loadExperimentButton.text")); // NOI18N
         loadExperimentButton.setMaximumSize(new java.awt.Dimension(110, 29));
         loadExperimentButton.setMinimumSize(new java.awt.Dimension(110, 29));
@@ -600,6 +625,7 @@ public class CIDAView extends FrameView {
         editResultsNameCheckBox.setText(resourceMap.getString("editResultsNameCheckBox.text")); // NOI18N
         editResultsNameCheckBox.setName("editResultsNameCheckBox"); // NOI18N
 
+        addToTestButton.setAction(actionMap.get("addExperimentToTest")); // NOI18N
         addToTestButton.setText(resourceMap.getString("addToTestButton.text")); // NOI18N
         addToTestButton.setMaximumSize(new java.awt.Dimension(110, 29));
         addToTestButton.setMinimumSize(new java.awt.Dimension(110, 29));
@@ -611,9 +637,11 @@ public class CIDAView extends FrameView {
 
         variablesComboBox.setName("variablesComboBox"); // NOI18N
 
+        addToAnalysisButton.setAction(actionMap.get("addVariableToAnalysis")); // NOI18N
         addToAnalysisButton.setText(resourceMap.getString("addToAnalysisButton.text")); // NOI18N
         addToAnalysisButton.setName("addToAnalysisButton"); // NOI18N
 
+        addToSynopsisButton.setAction(actionMap.get("addVariableToSynopsisTable")); // NOI18N
         addToSynopsisButton.setText(resourceMap.getString("addToSynopsisButton.text")); // NOI18N
         addToSynopsisButton.setName("addToSynopsisButton"); // NOI18N
 
@@ -621,11 +649,12 @@ public class CIDAView extends FrameView {
         addAllRowsCheckBox.setText(resourceMap.getString("addAllRowsCheckBox.text")); // NOI18N
         addAllRowsCheckBox.setName("addAllRowsCheckBox"); // NOI18N
 
-        addAllVariablesButton.setText(resourceMap.getString("addAllVariablesButton.text")); // NOI18N
-        addAllVariablesButton.setName("addAllVariablesButton"); // NOI18N
+        addAllVariablesAnalysisButton.setAction(actionMap.get("addAllToAnalysis")); // NOI18N
+        addAllVariablesAnalysisButton.setText(resourceMap.getString("addAllVariablesAnalysisButton.text")); // NOI18N
+        addAllVariablesAnalysisButton.setName("addAllVariablesAnalysisButton"); // NOI18N
 
-        jButton1.setText(resourceMap.getString("jButton1.text")); // NOI18N
-        jButton1.setName("jButton1"); // NOI18N
+        addAllVariablesSynopsisButton.setText(resourceMap.getString("addAllVariablesSynopsisButton.text")); // NOI18N
+        addAllVariablesSynopsisButton.setName("addAllVariablesSynopsisButton"); // NOI18N
 
         org.jdesktop.layout.GroupLayout homePanelLayout = new org.jdesktop.layout.GroupLayout(homePanel);
         homePanel.setLayout(homePanelLayout);
@@ -644,8 +673,8 @@ public class CIDAView extends FrameView {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                             .add(addToSynopsisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(addAllVariablesButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(addAllVariablesAnalysisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(addAllVariablesSynopsisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, addToAnalysisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addAllRowsCheckBox))
@@ -686,9 +715,9 @@ public class CIDAView extends FrameView {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(addToSynopsisButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(addAllVariablesButton)
+                .add(addAllVariablesAnalysisButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jButton1)
+                .add(addAllVariablesSynopsisButton)
                 .add(51, 51, 51)
                 .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -742,34 +771,44 @@ public class CIDAView extends FrameView {
         analysisToolbar.setRollover(true);
         analysisToolbar.setName("analysisToolbar"); // NOI18N
 
-        jButton2.setText(resourceMap.getString("jButton2.text")); // NOI18N
-        jButton2.setFocusable(false);
-        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2.setName("jButton2"); // NOI18N
-        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        analysisToolbar.add(jButton2);
+        plotButton.setAction(actionMap.get("plotGraph")); // NOI18N
+        plotButton.setText(resourceMap.getString("plotButton.text")); // NOI18N
+        plotButton.setFocusable(false);
+        plotButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        plotButton.setName("plotButton"); // NOI18N
+        plotButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        analysisToolbar.add(plotButton);
 
-        jButton4.setText(resourceMap.getString("jButton4.text")); // NOI18N
-        jButton4.setFocusable(false);
-        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton4.setName("jButton4"); // NOI18N
-        jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        analysisToolbar.add(jButton4);
+        clearAnalysisButton.setAction(actionMap.get("clearAnalysisTable")); // NOI18N
+        clearAnalysisButton.setText(resourceMap.getString("clearAnalysisButton.text")); // NOI18N
+        clearAnalysisButton.setFocusable(false);
+        clearAnalysisButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        clearAnalysisButton.setName("clearAnalysisButton"); // NOI18N
+        clearAnalysisButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        analysisToolbar.add(clearAnalysisButton);
 
-        jButton3.setText(resourceMap.getString("jButton3.text")); // NOI18N
-        jButton3.setFocusable(false);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setName("jButton3"); // NOI18N
-        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        analysisToolbar.add(jButton3);
+        exportAnalysisButton.setText(resourceMap.getString("exportAnalysisButton.text")); // NOI18N
+        exportAnalysisButton.setFocusable(false);
+        exportAnalysisButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        exportAnalysisButton.setName("exportAnalysisButton"); // NOI18N
+        exportAnalysisButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        analysisToolbar.add(exportAnalysisButton);
 
         analysisScrollPane.setName("analysisScrollPane"); // NOI18N
 
+        ListSelectionModel listSelectionModel = analysisTable.getSelectionModel();
+        listSelectionModel.addListSelectionListener(new SelectionListener(userSelectedRows));
+        analysisTable.setSelectionModel(listSelectionModel);
         analysisTable.setAutoCreateRowSorter(true);
         analysisTable.setModel(new IOBridgeTableModel());
+        analysisTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        analysisTable.setColumnSelectionAllowed(true);
         analysisTable.setName("analysisTable"); // NOI18N
         analysisScrollPane.setViewportView(analysisTable);
         analysisTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        listSelectionModel = analysisTable.getColumnModel().getSelectionModel();
+        listSelectionModel.addListSelectionListener(new SelectionListener(userSelectedColumns));
+        analysisTable.getColumnModel().setSelectionModel(listSelectionModel);
 
         org.jdesktop.layout.GroupLayout analysisPanelLayout = new org.jdesktop.layout.GroupLayout(analysisPanel);
         analysisPanel.setLayout(analysisPanelLayout);
@@ -794,6 +833,7 @@ public class CIDAView extends FrameView {
         chartToolbar.setRollover(true);
         chartToolbar.setName("chartToolbar"); // NOI18N
 
+        toggleLineTicksButton.setAction(actionMap.get("toggleLineTicks")); // NOI18N
         toggleLineTicksButton.setText(resourceMap.getString("toggleLineTicksButton.text")); // NOI18N
         toggleLineTicksButton.setFocusable(false);
         toggleLineTicksButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -805,6 +845,7 @@ public class CIDAView extends FrameView {
         lineSeriesComboBox.setName("lineSeriesComboBox"); // NOI18N
         chartToolbar.add(lineSeriesComboBox);
 
+        seriesColorButton.setAction(actionMap.get("changeSeriesColor")); // NOI18N
         seriesColorButton.setText(resourceMap.getString("seriesColorButton.text")); // NOI18N
         seriesColorButton.setFocusable(false);
         seriesColorButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -812,6 +853,7 @@ public class CIDAView extends FrameView {
         seriesColorButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         chartToolbar.add(seriesColorButton);
 
+        seriesNameButton.setAction(actionMap.get("changeSeriesName")); // NOI18N
         seriesNameButton.setText(resourceMap.getString("seriesNameButton.text")); // NOI18N
         seriesNameButton.setFocusable(false);
         seriesNameButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -819,6 +861,7 @@ public class CIDAView extends FrameView {
         seriesNameButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         chartToolbar.add(seriesNameButton);
 
+        exportPNGButton.setAction(actionMap.get("savePlotPNG")); // NOI18N
         exportPNGButton.setText(resourceMap.getString("exportPNGButton.text")); // NOI18N
         exportPNGButton.setFocusable(false);
         exportPNGButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -826,6 +869,7 @@ public class CIDAView extends FrameView {
         exportPNGButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         chartToolbar.add(exportPNGButton);
 
+        exportEPSButton.setAction(actionMap.get("savePlotEPS")); // NOI18N
         exportEPSButton.setText(resourceMap.getString("exportEPSButton.text")); // NOI18N
         exportEPSButton.setFocusable(false);
         exportEPSButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -940,7 +984,6 @@ public class CIDAView extends FrameView {
         fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(cs.cirg.cida.CIDAApplication.class).getContext().getActionMap(CIDAView.class, this);
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setName("exitMenuItem"); // NOI18N
         fileMenu.add(exitMenuItem);
@@ -999,7 +1042,8 @@ public class CIDAView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addAllRowsCheckBox;
-    private javax.swing.JButton addAllVariablesButton;
+    private javax.swing.JButton addAllVariablesAnalysisButton;
+    private javax.swing.JButton addAllVariablesSynopsisButton;
     private javax.swing.JButton addToAnalysisButton;
     private javax.swing.JButton addToSynopsisButton;
     private javax.swing.JButton addToTestButton;
@@ -1011,17 +1055,15 @@ public class CIDAView extends FrameView {
     private javax.swing.JPanel chartPanel;
     private javax.swing.JScrollPane chartScrollPane;
     private javax.swing.JToolBar chartToolbar;
+    private javax.swing.JButton clearAnalysisButton;
     private javax.swing.JCheckBox editResultsNameCheckBox;
     private javax.swing.JComboBox experimentsComboBox;
     private javax.swing.JLabel experimentsLabel;
+    private javax.swing.JButton exportAnalysisButton;
     private javax.swing.JButton exportDataButton;
     private javax.swing.JButton exportEPSButton;
     private javax.swing.JButton exportPNGButton;
     private javax.swing.JPanel homePanel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -1032,6 +1074,7 @@ public class CIDAView extends FrameView {
     private javax.swing.JPanel mainPanel;
     private javax.swing.JButton mannWhitneyUTestButton;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JButton plotButton;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JPanel rawPanel;
     private javax.swing.JToolBar rawPanelToolbar;
