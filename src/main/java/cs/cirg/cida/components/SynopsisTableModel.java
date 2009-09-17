@@ -1,4 +1,4 @@
-package cs.cirg.cida.analysis;
+package cs.cirg.cida.components;
 
 import cs.cirg.cida.experiment.Experiment;
 import java.util.ArrayList;

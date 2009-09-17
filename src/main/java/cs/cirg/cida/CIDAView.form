@@ -54,7 +54,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="variablesLabel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="jComboBox1" min="-2" pref="350" max="-2" attributes="0"/>
+                                  <Component id="variablesComboBox" min="-2" pref="350" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="addToSynopsisButton" alignment="0" max="32767" attributes="1"/>
@@ -75,7 +75,7 @@
                                       <Component id="loadExperimentButton" alignment="0" pref="129" max="32767" attributes="1"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="editResultsNameCheckBox" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace pref="192" max="32767" attributes="0"/>
                               </Group>
                           </Group>
@@ -91,7 +91,7 @@
                               <Component id="experimentsLabel" min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="loadExperimentButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="editResultsNameCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="experimentsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -103,7 +103,7 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="variablesLabel" min="-2" max="-2" attributes="0"/>
                               <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                                  <Component id="jComboBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="variablesComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="addToAnalysisButton" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="addAllRowsCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -144,7 +144,7 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                   <SubComponents>
-                    <Component class="javax.swing.JTable" name="jTable1">
+                    <Component class="javax.swing.JTable" name="synopsisTable">
                       <Properties>
                         <Property name="autoCreateRowSorter" type="boolean" value="true"/>
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -154,7 +154,7 @@
                           <TableColumnModel selectionModel="3"/>
                         </Property>
                         <Property name="columnSelectionAllowed" type="boolean" value="true"/>
-                        <Property name="name" type="java.lang.String" value="jTable1" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="synopsisTable" noResource="true"/>
                         <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
                           <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                         </Property>
@@ -191,10 +191,10 @@
                     <Property name="name" type="java.lang.String" value="experimentsComboBox" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JCheckBox" name="jCheckBox1">
+                <Component class="javax.swing.JCheckBox" name="editResultsNameCheckBox">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="jCheckBox1.text"/>
-                    <Property name="name" type="java.lang.String" value="jCheckBox1" noResource="true"/>
+                    <Property name="text" type="java.lang.String" resourceKey="editResultsNameCheckBox.text"/>
+                    <Property name="name" type="java.lang.String" value="editResultsNameCheckBox" noResource="true"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="addToTestButton">
@@ -218,12 +218,12 @@
                     <Property name="name" type="java.lang.String" value="variablesLabel" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JComboBox" name="jComboBox1">
+                <Component class="javax.swing.JComboBox" name="variablesComboBox">
                   <Properties>
                     <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <SerializedValue value="-84,-19,0,5,115,114,0,78,111,114,103,46,110,101,116,98,101,97,110,115,46,109,111,100,117,108,101,115,46,102,111,114,109,46,82,65,68,67,111,110,110,101,99,116,105,111,110,80,114,111,112,101,114,116,121,69,100,105,116,111,114,36,82,65,68,67,111,110,110,101,99,116,105,111,110,68,101,115,105,103,110,86,97,108,117,101,2,10,-70,90,-35,-97,-57,100,2,0,7,73,0,4,116,121,112,101,76,0,10,109,101,116,104,111,100,78,97,109,101,116,0,18,76,106,97,118,97,47,108,97,110,103,47,83,116,114,105,110,103,59,76,0,12,112,114,111,112,101,114,116,121,78,97,109,101,113,0,126,0,1,76,0,16,114,97,100,67,111,109,112,111,110,101,110,116,78,97,109,101,113,0,126,0,1,76,0,16,114,101,113,117,105,114,101,100,84,121,112,101,78,97,109,101,113,0,126,0,1,76,0,8,117,115,101,114,67,111,100,101,113,0,126,0,1,76,0,5,118,97,108,117,101,113,0,126,0,1,120,112,0,0,0,2,112,112,112,112,116,0,0,112"/>
                     </Property>
-                    <Property name="name" type="java.lang.String" value="jComboBox1" noResource="true"/>
+                    <Property name="name" type="java.lang.String" value="variablesComboBox" noResource="true"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="addToAnalysisButton">
@@ -417,7 +417,7 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
                   <SubComponents>
-                    <Component class="javax.swing.JTable" name="rawTable1">
+                    <Component class="javax.swing.JTable" name="analysisTable">
                       <Properties>
                         <Property name="autoCreateRowSorter" type="boolean" value="true"/>
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
@@ -426,7 +426,7 @@
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                           <TableColumnModel selectionModel="3"/>
                         </Property>
-                        <Property name="name" type="java.lang.String" value="rawTable1" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="analysisTable" noResource="true"/>
                         <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
                           <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
                         </Property>
@@ -474,12 +474,12 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
                   <SubComponents>
-                    <Component class="javax.swing.JToggleButton" name="jToggleButton1">
+                    <Component class="javax.swing.JToggleButton" name="toggleLineTicksButton">
                       <Properties>
-                        <Property name="text" type="java.lang.String" resourceKey="jToggleButton1.text"/>
+                        <Property name="text" type="java.lang.String" resourceKey="toggleLineTicksButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="horizontalTextPosition" type="int" value="0"/>
-                        <Property name="name" type="java.lang.String" value="jToggleButton1" noResource="true"/>
+                        <Property name="name" type="java.lang.String" value="toggleLineTicksButton" noResource="true"/>
                         <Property name="verticalTextPosition" type="int" value="3"/>
                       </Properties>
                     </Component>

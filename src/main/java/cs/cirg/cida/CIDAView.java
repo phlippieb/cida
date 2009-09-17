@@ -1,11 +1,20 @@
 /*
  * CIDAView.java
  */
-
 package cs.cirg.cida;
 
-import cs.cirg.cida.analysis.SynopsisTableModel;
-import cs.cirg.cida.table.IOBridgeTableModel;
+import cs.cirg.cida.components.CIlibOutputReader;
+import cs.cirg.cida.components.SynopsisTableModel;
+import cs.cirg.cida.components.IOBridgeTableModel;
+import cs.cirg.cida.components.SeriesPair;
+import cs.cirg.cida.experiment.Experiment;
+import cs.cirg.cida.experiment.ExperimentManager;
+import cs.cirg.cida.io.DataTable;
+import cs.cirg.cida.io.DataTableBuilder;
+import cs.cirg.cida.io.StandardDataTable;
+import cs.cirg.cida.io.exception.CIlibIOException;
+import java.awt.Color;
+import java.awt.Paint;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -13,16 +22,49 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Timer;
 import javax.swing.Icon;
+import javax.swing.JColorChooser;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Real;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.xmlgraphics.java2d.GraphicContext;
+import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.event.PlotChangeEvent;
+import org.jfree.chart.plot.DefaultDrawingSupplier;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  * The application's main frame.
  */
 public class CIDAView extends FrameView {
+
+    private Experiment selectedExperiment;
+    private List<Integer> userSelectedRows;
+    private List<Integer> userSelectedColumns;
+    private ExperimentManager experimentManager;
+    private List<Experiment> testExperiments;
+    private String analysisName;
+    private String startupDirectory;
 
     public CIDAView(SingleFrameApplication app) {
         super(app);
@@ -33,6 +75,7 @@ public class CIDAView extends FrameView {
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
         messageTimer = new Timer(messageTimeout, new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 statusMessageLabel.setText("");
             }
@@ -43,6 +86,7 @@ public class CIDAView extends FrameView {
             busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
         }
         busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
                 statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
@@ -55,6 +99,7 @@ public class CIDAView extends FrameView {
         // connecting action tasks to status bar via TaskMonitor
         TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
         taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 String propertyName = evt.getPropertyName();
                 if ("started".equals(propertyName)) {
@@ -71,17 +116,218 @@ public class CIDAView extends FrameView {
                     progressBar.setVisible(false);
                     progressBar.setValue(0);
                 } else if ("message".equals(propertyName)) {
-                    String text = (String)(evt.getNewValue());
+                    String text = (String) (evt.getNewValue());
                     statusMessageLabel.setText((text == null) ? "" : text);
                     messageTimer.restart();
                 } else if ("progress".equals(propertyName)) {
-                    int value = (Integer)(evt.getNewValue());
+                    int value = (Integer) (evt.getNewValue());
                     progressBar.setVisible(true);
                     progressBar.setIndeterminate(false);
                     progressBar.setValue(value);
                 }
             }
         });
+    }
+
+    @Action
+    public void loadExperiment() {
+        JFileChooser chooser = new JFileChooser(startupDirectory);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                "Text and CSV files", "txt", "csv");
+        chooser.setFileFilter(filter);
+        chooser.setMultiSelectionEnabled(true);
+        int returnVal = chooser.showOpenDialog(this.getComponent());
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            try {
+                File[] files = chooser.getSelectedFiles();
+                for (File dataFile : files) {
+                    String experimentName = dataFile.getName().substring(0, dataFile.getName().lastIndexOf("."));
+                    if (editResultsNameCheckBox.isSelected()) {
+                        CIDADialog dialog = new CIDADialog(this.getFrame(), "Experiment name:", experimentName);
+                        experimentName = dialog.getInput();
+                    }
+
+                    CIlibOutputReader reader = new CIlibOutputReader();
+                    reader.setSourceURL(dataFile.getAbsolutePath());
+                    DataTableBuilder dataTableBuilder = new DataTableBuilder(reader);
+                    dataTableBuilder.buildDataTable();
+
+                    Experiment experiment = new Experiment(experimentManager.nextExperimentID(), (StandardDataTable<Numeric>) dataTableBuilder.getDataTable());
+                    experiment.setDataSource(dataFile.getAbsolutePath());
+                    experiment.setName(experimentName);
+                    experimentManager.addExperiment(experiment);
+                    experimentsComboBox.addItem(experimentName);
+                    experimentsComboBox.setSelectedItem(experimentName);
+
+                    this.selectExperiment();
+                }
+            } catch (CIlibIOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    @Action
+    public void selectExperiment() {
+        if (((String) experimentsComboBox.getSelectedItem()).isEmpty()) {
+            return;
+        }
+        String selectedExperimentName = (String) experimentsComboBox.getSelectedItem();
+        selectedExperiment = null;
+        selectedExperiment = experimentManager.getExperiment(selectedExperimentName);
+        List<String> variableNames = selectedExperiment.getVariableNames();
+        variablesComboBox.removeAllItems();
+        for (String variableName : variableNames) {
+            variablesComboBox.addItem(variableName);
+        }
+
+        IOBridgeTableModel model = new IOBridgeTableModel();
+        model.setDataTable(selectedExperiment.getData());
+        rawTable.setModel(model);
+    }
+
+    @Action
+    public void addVariableToAnalysis() {
+        if (variablesComboBox.getSelectedItem() == null) {
+            return;
+        }
+        if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
+            return;
+        }
+
+        String variableName = (String) variablesComboBox.getSelectedItem();
+        addVariableToAnalysis(selectedExperiment, variableName);
+    }
+
+    public void addVariableToAnalysis(Experiment experiment, String variableName) {
+        if (!analysisName.contains(experiment.getName())) {
+            analysisName = experiment.getName() + " " + analysisName;
+        }
+        if (!analysisName.contains(variableName)) {
+            analysisName = analysisName + variableName;
+        }
+
+        DataTable analysisDataTable = ((IOBridgeTableModel) analysisTable.getModel()).getDataTable();
+
+        List<DescriptiveStatistics> statistics = experiment.getStatistics(variableName);
+
+        int iterationsToAdd = statistics.size();
+        if (!addAllRowsCheckBox.isSelected()) {
+            CIDADialog dialog = new CIDADialog(this.getFrame(), "Number of rows:", "" + iterationsToAdd);
+            iterationsToAdd = Integer.parseInt(dialog.getInput());
+        }
+
+        if (analysisDataTable.getNumColums() == 0) {
+            List<Numeric> iterations = experiment.getIterationColumn();
+
+            int size = iterations.size();
+            for (int i = size - 1; i >= iterationsToAdd; i--) {
+                iterations.remove(i);
+            }
+
+            analysisDataTable.addColumn(iterations);
+            analysisDataTable.setColumnName(0, "Iterations");
+        }
+
+        int size = statistics.size();
+
+        List<Real> means = new ArrayList<Real>(size);
+        List<Real> stddevs = new ArrayList<Real>(size);
+
+        for (int i = 0; i < size; i++) {
+            means.add(new Real(statistics.get(i).getMean()));
+            stddevs.add(new Real(statistics.get(i).getStandardDeviation()));
+        }
+
+        analysisDataTable.addColumn(means);
+        analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, experiment.getName() + " " + variableName + " Mean");
+        analysisDataTable.addColumn(stddevs);
+        analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, experiment.getName() + " " + variableName + " Std Dev");
+
+        IOBridgeTableModel model = new IOBridgeTableModel();
+        model.setDataTable((StandardDataTable<Numeric>) analysisDataTable);
+        analysisTable.setModel(model);
+
+        addVariableToSynopsisTable(experiment, variableName);
+    }
+
+    @Action
+    public void addVariableToSynopsisTable() {
+        if (variablesComboBox.getSelectedItem() == null) {
+            return;
+        }
+        if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
+            return;
+        }
+
+        String variableName = (String) variablesComboBox.getSelectedItem();
+        addVariableToSynopsisTable(selectedExperiment, variableName);
+    }
+
+    public void addVariableToSynopsisTable(Experiment experiment, String variable) {
+        SynopsisTableModel model = (SynopsisTableModel) synopsisTable.getModel();
+
+        if (!model.getVariables().contains(variable)) {
+            model.getVariables().add(variable);
+        }
+
+        if (!model.getExperiments().contains(experiment)) {
+            model.getExperiments().add(experiment);
+        }
+
+        SynopsisTableModel newModel = new SynopsisTableModel(model);
+
+        synopsisTable.setModel(newModel);
+    }
+
+    @Action
+    public void addAllToAnalysis() {
+        int numVars = variablesComboBox.getItemCount();
+        for (int i = 0; i < numVars; i++) {
+            String variable = (String) variablesComboBox.getItemAt(i);
+            addVariableToAnalysis(selectedExperiment, variable);
+        }
+    }
+
+    @Action
+    public void addAllToSynopsis() {
+        int numVars = variablesComboBox.getItemCount();
+        for (int i = 0; i < numVars; i++) {
+            String variable = (String) variablesComboBox.getItemAt(i);
+            addVariableToSynopsisTable(selectedExperiment, variable);
+        }
+    }
+
+    @Action
+    public void addExperimentToTest() {
+        if (variablesComboBox.getSelectedItem() == null) {
+            return;
+        }
+        if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
+            return;
+        }
+
+        String variableName = (String) variablesComboBox.getSelectedItem();
+        addExperimentToTest(selectedExperiment, variableName);
+    }
+
+    public void addExperimentToTest(Experiment experiment, String variable) {
+        if (selectedExperiment == null)
+            return;
+        testExperiments.add(selectedExperiment);
+        SynopsisTableModel model = (SynopsisTableModel) testExperimentsTable.getModel();
+
+        if (!model.getVariables().contains(variable)) {
+            model.getVariables().add(variable);
+        }
+
+        if (!model.getExperiments().contains(experiment)) {
+            model.getExperiments().add(experiment);
+        }
+
+        SynopsisTableModel newModel = new SynopsisTableModel(model);
+
+        testExperimentsTable.setModel(newModel);
     }
 
     @Action
@@ -92,6 +338,160 @@ public class CIDAView extends FrameView {
             aboutBox.setLocationRelativeTo(mainFrame);
         }
         CIDAApplication.getApplication().show(aboutBox);
+    }
+
+    @Action
+    public void exportAnalysis() {
+        /**try {
+        CSVFileWriter writer = new CSVFileWriter();
+        writer.setDestinationURL(this.resultsFileText.getText());
+        writer.open();
+        writer.write(((IOBridgeTableModel) analysisTable.getModel()).getDataTable());
+        writer.close();
+        } catch (CIlibIOException ex) {
+        ex.printStackTrace();
+        }**/
+    }
+
+    @Action
+    public void clearAnalysisTable() {
+        analysisTable.setModel(new IOBridgeTableModel());
+    }
+
+    @Action
+    public void plotGraph() {
+        lineSeriesComboBox.removeAllItems();
+        int numSelectedColumns = userSelectedColumns.size();
+        int numSelectedRows = userSelectedRows.size();
+        if (numSelectedColumns == 0) {
+            return;
+        }
+        StandardDataTable<Numeric> data = (StandardDataTable<Numeric>) ((IOBridgeTableModel) analysisTable.getModel()).getDataTable();
+        List<Numeric> iterations = data.getColumn(0);
+
+        XYSeriesCollection xySeriesCollection = new XYSeriesCollection();
+
+
+        for (int i = 0; i < numSelectedColumns; i++) {
+            int selectedColumnIndex = userSelectedColumns.get(i);
+            List<Numeric> selectedColumn = data.getColumn(selectedColumnIndex);
+
+            XYSeries series = new XYSeries(data.getColumnName(selectedColumnIndex));
+
+            for (int k = 0; k < numSelectedRows; k++) {
+                int selectedRowIndex = userSelectedRows.get(k);
+                series.add(iterations.get(selectedRowIndex).getReal(), selectedColumn.get(selectedRowIndex).getReal());
+            }
+            xySeriesCollection.addSeries(series);
+            lineSeriesComboBox.addItem(new SeriesPair(i, (String) series.getKey()));
+        }
+
+        JFreeChart chart = ChartFactory.createXYLineChart(analysisName, // Title
+                "Iterations", // X-Axis label
+                "Value", // Y-Axis label
+                xySeriesCollection, // Dataset
+                PlotOrientation.VERTICAL,
+                true, // Show legend,
+                false, //tooltips
+                false //urls
+                );
+        chart.setAntiAlias(true);
+        chart.setAntiAlias(true);
+        XYPlot plot = (XYPlot) chart.getPlot();
+        Paint[] paints = new Paint[7];
+        paints[0] = Color.RED;
+        paints[1] = Color.BLUE;
+        paints[2] = new Color(0.08f, 0.5f, 0.04f);
+        paints[3] = new Color(1.0f, 0.37f, 0.0f);
+        paints[4] = new Color(0.38f, 0.07f, 0.42f);
+        paints[5] = Color.CYAN;
+        paints[6] = Color.PINK;
+        plot.setDrawingSupplier(new DefaultDrawingSupplier(paints, paints,
+                DefaultDrawingSupplier.DEFAULT_STROKE_SEQUENCE,
+                DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
+                DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE));
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setDomainGridlinePaint(Color.GRAY);
+        plot.setRangeGridlinePaint(Color.GRAY);
+
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+        plot.setRenderer(renderer);
+
+        ((ChartPanel) chartPanel).setChart(chart);
+    }
+
+    @Action
+    public void toggleLineTicks() {
+        if (toggleLineTicksButton.isSelected()) {
+            JFreeChart chart = ((ChartPanel) chartPanel).getChart();
+            XYPlot plot = (XYPlot) chart.getPlot();
+            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+            int seriesCount = plot.getSeriesCount();
+            for (int i = 0; i < seriesCount; i++) {
+                renderer.setSeriesShapesVisible(i, true);
+            }
+        } else {
+            JFreeChart chart = ((ChartPanel) chartPanel).getChart();
+            XYPlot plot = (XYPlot) chart.getPlot();
+            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+            int seriesCount = plot.getSeriesCount();
+            for (int i = 0; i < seriesCount; i++) {
+                renderer.setSeriesShapesVisible(i, false);
+            }
+        }
+    }
+
+    @Action
+    public void changeSeriesName() {
+        SeriesPair series = (SeriesPair) lineSeriesComboBox.getSelectedItem();
+        JFreeChart chart = ((ChartPanel) chartPanel).getChart();
+        XYPlot plot = (XYPlot) chart.getPlot();
+        XYSeriesCollection xYSeriesCollection = (XYSeriesCollection) plot.getDataset();
+        CIDADialog dialog = new CIDADialog(this.getFrame(), "Enter new name: ", (String) xYSeriesCollection.getSeries(series.getValue()).getKey());
+        xYSeriesCollection.getSeries(series.getValue()).setKey(dialog.getInput());
+        plot.notifyListeners(new PlotChangeEvent(plot));
+        lineSeriesComboBox.removeItem(series);
+        lineSeriesComboBox.addItem(new SeriesPair(series.getKey(), dialog.getInput()));
+    }
+
+    @Action
+    public void changeSeriesColor() {
+        SeriesPair series = (SeriesPair) lineSeriesComboBox.getSelectedItem();
+        JFreeChart chart = ((ChartPanel) chartPanel).getChart();
+        XYPlot plot = (XYPlot) chart.getPlot();
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(series.getKey(), JColorChooser.showDialog(this.getFrame(), "Choose color", Color.BLACK));
+    }
+
+    @Action
+    public void savePlotEPS() {
+        JFreeChart chartToSave = ((ChartPanel) chartPanel).getChart();
+        String name = chartToSave.getTitle().getText();
+        name = name.trim().replaceAll(" ", "");
+        try {
+            OutputStream out = new FileOutputStream(name + ".eps");
+            EPSDocumentGraphics2D g2d = new EPSDocumentGraphics2D(false);
+            g2d.setGraphicContext(new GraphicContext());
+
+            g2d.setupDocument(out, 800, 600);
+            chartToSave.draw(g2d, new Rectangle2D.Double(0, 0, 800, 600));
+
+            g2d.finish();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Action
+    public void savePlotPNG() {
+        JFreeChart chartToSave = ((ChartPanel) chartPanel).getChart();
+        String name = chartToSave.getTitle().getText();
+        name = name.trim().replaceAll(" ", "");
+        try {
+            ChartUtilities.saveChartAsPNG(new File(name + ".png"), chartToSave, 800, 600);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /** This method is called from within the constructor to
@@ -109,14 +509,14 @@ public class CIDAView extends FrameView {
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        synopsisTable = new javax.swing.JTable();
         experimentsLabel = new javax.swing.JLabel();
         loadExperimentButton = new javax.swing.JButton();
         experimentsComboBox = new javax.swing.JComboBox();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        editResultsNameCheckBox = new javax.swing.JCheckBox();
         addToTestButton = new javax.swing.JButton();
         variablesLabel = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        variablesComboBox = new javax.swing.JComboBox();
         addToAnalysisButton = new javax.swing.JButton();
         addToSynopsisButton = new javax.swing.JButton();
         addAllRowsCheckBox = new javax.swing.JCheckBox();
@@ -133,10 +533,10 @@ public class CIDAView extends FrameView {
         jButton4 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         analysisScrollPane = new javax.swing.JScrollPane();
-        rawTable1 = new javax.swing.JTable();
+        analysisTable = new javax.swing.JTable();
         chartHomePanel = new javax.swing.JPanel();
         chartToolbar = new javax.swing.JToolBar();
-        jToggleButton1 = new javax.swing.JToggleButton();
+        toggleLineTicksButton = new javax.swing.JToggleButton();
         lineSeriesComboBox = new javax.swing.JComboBox();
         seriesColorButton = new javax.swing.JButton();
         seriesNameButton = new javax.swing.JButton();
@@ -177,12 +577,12 @@ public class CIDAView extends FrameView {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(new SynopsisTableModel());
-        jTable1.setColumnSelectionAllowed(true);
-        jTable1.setName("jTable1"); // NOI18N
-        jScrollPane1.setViewportView(jTable1);
-        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        synopsisTable.setAutoCreateRowSorter(true);
+        synopsisTable.setModel(new SynopsisTableModel());
+        synopsisTable.setColumnSelectionAllowed(true);
+        synopsisTable.setName("synopsisTable"); // NOI18N
+        jScrollPane1.setViewportView(synopsisTable);
+        synopsisTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(cs.cirg.cida.CIDAApplication.class).getContext().getResourceMap(CIDAView.class);
         experimentsLabel.setText(resourceMap.getString("experimentsLabel.text")); // NOI18N
@@ -197,8 +597,8 @@ public class CIDAView extends FrameView {
         experimentsComboBox.setModel(new javax.swing.DefaultComboBoxModel());
         experimentsComboBox.setName("experimentsComboBox"); // NOI18N
 
-        jCheckBox1.setText(resourceMap.getString("jCheckBox1.text")); // NOI18N
-        jCheckBox1.setName("jCheckBox1"); // NOI18N
+        editResultsNameCheckBox.setText(resourceMap.getString("editResultsNameCheckBox.text")); // NOI18N
+        editResultsNameCheckBox.setName("editResultsNameCheckBox"); // NOI18N
 
         addToTestButton.setText(resourceMap.getString("addToTestButton.text")); // NOI18N
         addToTestButton.setMaximumSize(new java.awt.Dimension(110, 29));
@@ -209,7 +609,7 @@ public class CIDAView extends FrameView {
         variablesLabel.setText(resourceMap.getString("variablesLabel.text")); // NOI18N
         variablesLabel.setName("variablesLabel"); // NOI18N
 
-        jComboBox1.setName("jComboBox1"); // NOI18N
+        variablesComboBox.setName("variablesComboBox"); // NOI18N
 
         addToAnalysisButton.setText(resourceMap.getString("addToAnalysisButton.text")); // NOI18N
         addToAnalysisButton.setName("addToAnalysisButton"); // NOI18N
@@ -240,7 +640,7 @@ public class CIDAView extends FrameView {
                     .add(homePanelLayout.createSequentialGroup()
                         .add(variablesLabel)
                         .add(18, 18, 18)
-                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 350, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(variablesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 350, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                             .add(addToSynopsisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -258,7 +658,7 @@ public class CIDAView extends FrameView {
                             .add(org.jdesktop.layout.GroupLayout.LEADING, addToTestButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(org.jdesktop.layout.GroupLayout.LEADING, loadExperimentButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jCheckBox1)
+                        .add(editResultsNameCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 192, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -270,7 +670,7 @@ public class CIDAView extends FrameView {
                     .add(experimentsLabel)
                     .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(loadExperimentButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(jCheckBox1)
+                        .add(editResultsNameCheckBox)
                         .add(experimentsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(addToTestButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -280,7 +680,7 @@ public class CIDAView extends FrameView {
                 .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(variablesLabel)
                     .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(variablesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(addToAnalysisButton)
                         .add(addAllRowsCheckBox)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
@@ -365,11 +765,11 @@ public class CIDAView extends FrameView {
 
         analysisScrollPane.setName("analysisScrollPane"); // NOI18N
 
-        rawTable1.setAutoCreateRowSorter(true);
-        rawTable1.setModel(new IOBridgeTableModel());
-        rawTable1.setName("rawTable1"); // NOI18N
-        analysisScrollPane.setViewportView(rawTable1);
-        rawTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        analysisTable.setAutoCreateRowSorter(true);
+        analysisTable.setModel(new IOBridgeTableModel());
+        analysisTable.setName("analysisTable"); // NOI18N
+        analysisScrollPane.setViewportView(analysisTable);
+        analysisTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         org.jdesktop.layout.GroupLayout analysisPanelLayout = new org.jdesktop.layout.GroupLayout(analysisPanel);
         analysisPanel.setLayout(analysisPanelLayout);
@@ -394,12 +794,12 @@ public class CIDAView extends FrameView {
         chartToolbar.setRollover(true);
         chartToolbar.setName("chartToolbar"); // NOI18N
 
-        jToggleButton1.setText(resourceMap.getString("jToggleButton1.text")); // NOI18N
-        jToggleButton1.setFocusable(false);
-        jToggleButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jToggleButton1.setName("jToggleButton1"); // NOI18N
-        jToggleButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        chartToolbar.add(jToggleButton1);
+        toggleLineTicksButton.setText(resourceMap.getString("toggleLineTicksButton.text")); // NOI18N
+        toggleLineTicksButton.setFocusable(false);
+        toggleLineTicksButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        toggleLineTicksButton.setName("toggleLineTicksButton"); // NOI18N
+        toggleLineTicksButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        chartToolbar.add(toggleLineTicksButton);
 
         lineSeriesComboBox.setModel(new javax.swing.DefaultComboBoxModel());
         lineSeriesComboBox.setName("lineSeriesComboBox"); // NOI18N
@@ -597,7 +997,6 @@ public class CIDAView extends FrameView {
         setMenuBar(menuBar);
         setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addAllRowsCheckBox;
     private javax.swing.JButton addAllVariablesButton;
@@ -606,11 +1005,13 @@ public class CIDAView extends FrameView {
     private javax.swing.JButton addToTestButton;
     private javax.swing.JPanel analysisPanel;
     private javax.swing.JScrollPane analysisScrollPane;
+    private javax.swing.JTable analysisTable;
     private javax.swing.JToolBar analysisToolbar;
     private javax.swing.JPanel chartHomePanel;
     private javax.swing.JPanel chartPanel;
     private javax.swing.JScrollPane chartScrollPane;
     private javax.swing.JToolBar chartToolbar;
+    private javax.swing.JCheckBox editResultsNameCheckBox;
     private javax.swing.JComboBox experimentsComboBox;
     private javax.swing.JLabel experimentsLabel;
     private javax.swing.JButton exportDataButton;
@@ -621,15 +1022,11 @@ public class CIDAView extends FrameView {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JComboBox lineSeriesComboBox;
     private javax.swing.JButton loadExperimentButton;
     private javax.swing.JPanel mainPanel;
@@ -640,27 +1037,27 @@ public class CIDAView extends FrameView {
     private javax.swing.JToolBar rawPanelToolbar;
     private javax.swing.JScrollPane rawScrollPane;
     private javax.swing.JTable rawTable;
-    private javax.swing.JTable rawTable1;
     private javax.swing.JButton seriesColorButton;
     private javax.swing.JButton seriesNameButton;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
+    private javax.swing.JTable synopsisTable;
     private javax.swing.JScrollPane testExperimentsScrollPane;
     private javax.swing.JTable testExperimentsTable;
     private javax.swing.JTabbedPane testPanel;
     private javax.swing.JScrollPane testResultsScrollPane;
     private javax.swing.JTable testResultsTable;
     private javax.swing.JToolBar testToolbar;
+    private javax.swing.JToggleButton toggleLineTicksButton;
+    private javax.swing.JComboBox variablesComboBox;
     private javax.swing.JLabel variablesLabel;
     private javax.swing.JComboBox variablesTestComboBox;
     // End of variables declaration//GEN-END:variables
-
     private final Timer messageTimer;
     private final Timer busyIconTimer;
     private final Icon idleIcon;
     private final Icon[] busyIcons = new Icon[15];
     private int busyIconIndex = 0;
-
     private JDialog aboutBox;
 }
