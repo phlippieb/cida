@@ -27,6 +27,7 @@ import jsc.independentsamples.MannWhitneyTest;
 import jsc.tests.H1;
 import net.sourceforge.cilib.type.types.StringType;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import sun.reflect.Reflection;
 
 /**
  *
@@ -51,8 +52,8 @@ public class MannWhitneyUTest extends StatisticalTest {
             xA[i] = stats1.getElement(i);
             xB[i] = stats2.getElement(i);
         }
-        System.out.println(Arrays.toString(xA));
-        System.out.println(Arrays.toString(xB));
+        //System.out.println(Arrays.toString(xA));
+        //System.out.println(Arrays.toString(xB));
         H1 h1 = H1.NOT_EQUAL;
         MannWhitneyTest mannWhitneyTest = new MannWhitneyTest(xA, xB, h1, 0.0, false);
 
