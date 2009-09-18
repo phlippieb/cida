@@ -193,6 +193,9 @@
                     </Property>
                     <Property name="name" type="java.lang.String" value="experimentsComboBox" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="experimentsComboBoxActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="editResultsNameCheckBox">
                   <Properties>
@@ -315,6 +318,9 @@
                   <SubComponents>
                     <Component class="javax.swing.JButton" name="exportDataButton">
                       <Properties>
+                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                          <action class="cs.cirg.cida.CIDAView" id="exportRaw" methodName="exportRaw"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" resourceKey="exportDataButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -340,6 +346,7 @@
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                           <Connection code="new IOBridgeTableModel()" type="code"/>
                         </Property>
+                        <Property name="autoResizeMode" type="int" value="0"/>
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
                           <TableColumnModel selectionModel="3"/>
                         </Property>
@@ -419,6 +426,9 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="exportAnalysisButton">
                       <Properties>
+                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                          <action class="cs.cirg.cida.CIDAView" id="exportAnalysis" methodName="exportAnalysis"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" resourceKey="exportAnalysisButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -444,7 +454,7 @@
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                           <Connection code="new IOBridgeTableModel()" type="code"/>
                         </Property>
-                        <Property name="autoResizeMode" type="int" value="4"/>
+                        <Property name="autoResizeMode" type="int" value="0"/>
                         <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor" postCode="listSelectionModel = analysisTable.getColumnModel().getSelectionModel();&#xa;listSelectionModel.addListSelectionListener(new SelectionListener(userSelectedColumns));&#xa;analysisTable.getColumnModel().setSelectionModel(listSelectionModel);">
                           <TableColumnModel selectionModel="3"/>
                         </Property>
@@ -659,6 +669,9 @@
                     </Component>
                     <Component class="javax.swing.JButton" name="mannWhitneyUTestButton">
                       <Properties>
+                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                          <action class="cs.cirg.cida.CIDAView" id="runMannWhitneyUTest" methodName="runMannWhitneyUTest"/>
+                        </Property>
                         <Property name="text" type="java.lang.String" resourceKey="mannWhitneyUTestButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
                         <Property name="horizontalTextPosition" type="int" value="0"/>

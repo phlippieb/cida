@@ -45,8 +45,6 @@ public class MannWhitneyUTest extends StatisticalTest {
         DescriptiveStatistics stats1 = experiment1.getFinalIterationStatistics(variableNames[0]);
         DescriptiveStatistics stats2 = experiment2.getFinalIterationStatistics(variableNames[0]);
 
-        System.out.println(stats1.getN());
-        System.out.println(stats2.getN());
         double[] xA = new double[(int) stats1.getN()];
         double[] xB = new double[(int) stats2.getN()];
         for (int i = 0; i < xA.length; i++) {
@@ -55,7 +53,7 @@ public class MannWhitneyUTest extends StatisticalTest {
         }
         System.out.println(Arrays.toString(xA));
         System.out.println(Arrays.toString(xB));
-        H1 h1 = H1.LESS_THAN;
+        H1 h1 = H1.NOT_EQUAL;
         MannWhitneyTest mannWhitneyTest = new MannWhitneyTest(xA, xB, h1, 0.0, false);
 
         results = new StandardDataTable<StringType>();
@@ -71,12 +69,12 @@ public class MannWhitneyUTest extends StatisticalTest {
         results.addRow(row);
 
         row = new ArrayList<StringType>();
-        row.add(new StringType("Significance Probability"));
+        row.add(new StringType("P value"));
         row.add(new StringType(mannWhitneyTest.exactSP() + ""));
         results.addRow(row);
 
         row = new ArrayList<StringType>();
-        row.add(new StringType("Approx Significance Probability"));
+        row.add(new StringType("Approx P value"));
         row.add(new StringType(mannWhitneyTest.approxSP() + ""));
         results.addRow(row);
 

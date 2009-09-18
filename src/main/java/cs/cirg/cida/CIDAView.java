@@ -3,6 +3,7 @@
  */
 package cs.cirg.cida;
 
+import com.google.common.collect.Sets;
 import cs.cirg.cida.analysis.MannWhitneyUTest;
 import cs.cirg.cida.components.CIlibOutputReader;
 import cs.cirg.cida.components.SynopsisTableModel;
@@ -11,6 +12,7 @@ import cs.cirg.cida.components.SelectionListener;
 import cs.cirg.cida.components.SeriesPair;
 import cs.cirg.cida.experiment.Experiment;
 import cs.cirg.cida.experiment.ExperimentManager;
+import cs.cirg.cida.io.CSVFileWriter;
 import cs.cirg.cida.io.DataTable;
 import cs.cirg.cida.io.DataTableBuilder;
 import cs.cirg.cida.io.StandardDataTable;
@@ -31,9 +33,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.swing.Timer;
 import javax.swing.Icon;
-import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -61,11 +63,13 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class CIDAView extends FrameView {
 
+    private Object selectedExperimentItem;
     private Experiment selectedExperiment;
     private List<Integer> userSelectedRows;
     private List<Integer> userSelectedColumns;
     private ExperimentManager experimentManager;
     private List<Experiment> testExperiments;
+    private List<String> testVariables;
     private String analysisName;
     private String startupDirectory;
 
@@ -73,9 +77,13 @@ public class CIDAView extends FrameView {
         super(app);
 
         startupDirectory = ((CIDAApplication) app).getStartupDirectory();
+        if (startupDirectory.charAt(startupDirectory.length() - 1) != '/') {
+            startupDirectory += '/';
+        }
         userSelectedRows = new ArrayList<Integer>();
         userSelectedColumns = new ArrayList<Integer>();
         testExperiments = new ArrayList<Experiment>();
+        testVariables = new ArrayList<String>();
         experimentManager = ExperimentManager.getInstance();
         analysisName = "";
 
@@ -199,9 +207,11 @@ public class CIDAView extends FrameView {
     @Action
     public void addVariableToAnalysis() {
         if (variablesComboBox.getSelectedItem() == null) {
+            System.out.println("selected item null");
             return;
         }
         if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
+            System.out.println("variable box empty");
             return;
         }
 
@@ -211,7 +221,7 @@ public class CIDAView extends FrameView {
 
     public void addVariableToAnalysis(Experiment experiment, String variableName) {
         if (!analysisName.contains(experiment.getName())) {
-            analysisName = experiment.getName() + " " + analysisName;
+            analysisName = experiment.getName() + "_" + analysisName;
         }
         if (!analysisName.contains(variableName)) {
             analysisName = analysisName + variableName;
@@ -310,33 +320,36 @@ public class CIDAView extends FrameView {
 
     @Action
     public void addExperimentToTest() {
-        if (variablesComboBox.getSelectedItem() == null) {
-            return;
-        }
-        if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
+        if (selectedExperiment == null) {
             return;
         }
 
-        String variableName = (String) variablesComboBox.getSelectedItem();
-        addExperimentToTest(selectedExperiment, variableName);
+        addExperimentToTest(selectedExperiment);
     }
 
-    public void addExperimentToTest(Experiment experiment, String variable) {
-        if (selectedExperiment == null)
+    public void addExperimentToTest(Experiment experiment) {
+        if (selectedExperiment == null) {
             return;
-        testExperiments.add(selectedExperiment);
+        }
+        if (!testExperiments.contains(selectedExperiment))
+            testExperiments.add(selectedExperiment);
+        
+        Set<String> variableSet = Sets.newHashSet(testVariables);
+        Set<String> newVariables = Sets.newHashSet(selectedExperiment.getVariableNames());
+        variableSet = Sets.union(variableSet, newVariables);
+        testVariables.clear();
+        testVariables.addAll(variableSet);
+
+        variablesTestComboBox.removeAllItems();
+        for (String variable : testVariables) {
+            variablesTestComboBox.addItem(variable);
+        }
+
         SynopsisTableModel model = (SynopsisTableModel) testExperimentsTable.getModel();
-
-        if (!model.getVariables().contains(variable)) {
-            model.getVariables().add(variable);
-        }
-
-        if (!model.getExperiments().contains(experiment)) {
-            model.getExperiments().add(experiment);
-        }
+        model.setExperiments(testExperiments);
+        model.setVariables(testVariables);
 
         SynopsisTableModel newModel = new SynopsisTableModel(model);
-
         testExperimentsTable.setModel(newModel);
     }
 
@@ -351,16 +364,39 @@ public class CIDAView extends FrameView {
     }
 
     @Action
+    public void exportRaw() {
+        JFileChooser chooser = new JFileChooser(startupDirectory);
+        chooser.setSelectedFile(new File(selectedExperiment.getName() + ".csv"));
+        int returnVal = chooser.showOpenDialog(this.getComponent());
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            try {
+                CSVFileWriter writer = new CSVFileWriter();
+                writer.setFile(chooser.getSelectedFile());
+                writer.open();
+                writer.write(((IOBridgeTableModel) rawTable.getModel()).getDataTable());
+                writer.close();
+            } catch (CIlibIOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    @Action
     public void exportAnalysis() {
-        /**try {
-        CSVFileWriter writer = new CSVFileWriter();
-        writer.setDestinationURL(this.resultsFileText.getText());
-        writer.open();
-        writer.write(((IOBridgeTableModel) analysisTable.getModel()).getDataTable());
-        writer.close();
-        } catch (CIlibIOException ex) {
-        ex.printStackTrace();
-        }**/
+        JFileChooser chooser = new JFileChooser(startupDirectory);
+        chooser.setSelectedFile(new File(analysisName + ".csv"));
+        int returnVal = chooser.showOpenDialog(this.getComponent());
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            try {
+                CSVFileWriter writer = new CSVFileWriter();
+                writer.setFile(chooser.getSelectedFile());
+                writer.open();
+                writer.write(((IOBridgeTableModel) analysisTable.getModel()).getDataTable());
+                writer.close();
+            } catch (CIlibIOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     @Action
@@ -470,7 +506,6 @@ public class CIDAView extends FrameView {
         JFreeChart chart = ((ChartPanel) chartPanel).getChart();
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(series.getKey(), JColorChooser.showDialog(this.getFrame(), "Choose color", Color.BLACK));
     }
 
     @Action
@@ -506,11 +541,15 @@ public class CIDAView extends FrameView {
 
     @Action
     public void runMannWhitneyUTest() {
+        if (testExperiments.size() > 2) {
+            System.out.println("Mann Whitney U test is only applicable to 2 experiments.");
+            return;
+        }
         MannWhitneyUTest test = new MannWhitneyUTest();
         for (Experiment experiment : testExperiments) {
             test.addExperiment(experiment);
         }
-        test.performTest((String) variablesComboBox.getSelectedItem());
+        test.performTest((String) variablesTestComboBox.getSelectedItem());
         DataTable table = test.getResults();
         IOBridgeTableModel model = new IOBridgeTableModel();
         model.setDataTable((StandardDataTable<Numeric>) table);
@@ -621,6 +660,11 @@ public class CIDAView extends FrameView {
 
         experimentsComboBox.setModel(new javax.swing.DefaultComboBoxModel());
         experimentsComboBox.setName("experimentsComboBox"); // NOI18N
+        experimentsComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                experimentsComboBoxActionPerformed(evt);
+            }
+        });
 
         editResultsNameCheckBox.setText(resourceMap.getString("editResultsNameCheckBox.text")); // NOI18N
         editResultsNameCheckBox.setName("editResultsNameCheckBox"); // NOI18N
@@ -732,6 +776,7 @@ public class CIDAView extends FrameView {
         rawPanelToolbar.setRollover(true);
         rawPanelToolbar.setName("rawPanelToolbar"); // NOI18N
 
+        exportDataButton.setAction(actionMap.get("exportRaw")); // NOI18N
         exportDataButton.setText(resourceMap.getString("exportDataButton.text")); // NOI18N
         exportDataButton.setFocusable(false);
         exportDataButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -743,6 +788,7 @@ public class CIDAView extends FrameView {
 
         rawTable.setAutoCreateRowSorter(true);
         rawTable.setModel(new IOBridgeTableModel());
+        rawTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         rawTable.setColumnSelectionAllowed(true);
         rawTable.setName("rawTable"); // NOI18N
         rawScrollPane.setViewportView(rawTable);
@@ -787,6 +833,7 @@ public class CIDAView extends FrameView {
         clearAnalysisButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         analysisToolbar.add(clearAnalysisButton);
 
+        exportAnalysisButton.setAction(actionMap.get("exportAnalysis")); // NOI18N
         exportAnalysisButton.setText(resourceMap.getString("exportAnalysisButton.text")); // NOI18N
         exportAnalysisButton.setFocusable(false);
         exportAnalysisButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -801,7 +848,7 @@ public class CIDAView extends FrameView {
         analysisTable.setSelectionModel(listSelectionModel);
         analysisTable.setAutoCreateRowSorter(true);
         analysisTable.setModel(new IOBridgeTableModel());
-        analysisTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        analysisTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         analysisTable.setColumnSelectionAllowed(true);
         analysisTable.setName("analysisTable"); // NOI18N
         analysisScrollPane.setViewportView(analysisTable);
@@ -924,6 +971,7 @@ public class CIDAView extends FrameView {
         variablesTestComboBox.setName("variablesTestComboBox"); // NOI18N
         testToolbar.add(variablesTestComboBox);
 
+        mannWhitneyUTestButton.setAction(actionMap.get("runMannWhitneyUTest")); // NOI18N
         mannWhitneyUTestButton.setText(resourceMap.getString("mannWhitneyUTestButton.text")); // NOI18N
         mannWhitneyUTestButton.setFocusable(false);
         mannWhitneyUTestButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -1040,6 +1088,10 @@ public class CIDAView extends FrameView {
         setMenuBar(menuBar);
         setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void experimentsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_experimentsComboBoxActionPerformed
+        this.selectExperiment();
+    }//GEN-LAST:event_experimentsComboBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addAllRowsCheckBox;
     private javax.swing.JButton addAllVariablesAnalysisButton;
