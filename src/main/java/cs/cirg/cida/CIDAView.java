@@ -8,6 +8,7 @@ import cs.cirg.cida.analysis.MannWhitneyUTest;
 import cs.cirg.cida.components.CIlibOutputReader;
 import cs.cirg.cida.components.SynopsisTableModel;
 import cs.cirg.cida.components.IOBridgeTableModel;
+import cs.cirg.cida.components.IntervalXYRenderer;
 import cs.cirg.cida.components.SelectionListener;
 import cs.cirg.cida.components.SeriesPair;
 import cs.cirg.cida.experiment.Experiment;
@@ -331,9 +332,10 @@ public class CIDAView extends FrameView {
         if (selectedExperiment == null) {
             return;
         }
-        if (!testExperiments.contains(selectedExperiment))
+        if (!testExperiments.contains(selectedExperiment)) {
             testExperiments.add(selectedExperiment);
-        
+        }
+
         Set<String> variableSet = Sets.newHashSet(testVariables);
         Set<String> newVariables = Sets.newHashSet(selectedExperiment.getVariableNames());
         variableSet = Sets.union(variableSet, newVariables);
@@ -460,8 +462,9 @@ public class CIDAView extends FrameView {
         plot.setDomainGridlinePaint(Color.GRAY);
         plot.setRangeGridlinePaint(Color.GRAY);
 
-        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true, false);
+        IntervalXYRenderer renderer = new IntervalXYRenderer(true, false);
         plot.setRenderer(renderer);
+        lineTickIntervalInput.setText(Integer.toString(renderer.getLineTickInterval()));
 
         ((ChartPanel) chartPanel).setChart(chart);
     }
@@ -471,19 +474,18 @@ public class CIDAView extends FrameView {
         if (toggleLineTicksButton.isSelected()) {
             JFreeChart chart = ((ChartPanel) chartPanel).getChart();
             XYPlot plot = (XYPlot) chart.getPlot();
-            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-            int seriesCount = plot.getSeriesCount();
-            for (int i = 0; i < seriesCount; i++) {
-                renderer.setSeriesShapesVisible(i, true);
+            IntervalXYRenderer renderer = (IntervalXYRenderer) plot.getRenderer();
+            try {
+                renderer.setLineTickInterval(Integer.parseInt(lineTickIntervalInput.getText()));
+            } catch (NumberFormatException noe) {
+                renderer.setLineTickInterval(IntervalXYRenderer.lineTickIntervalDefault);
             }
+            renderer.setBaseShapesVisible(true);
         } else {
             JFreeChart chart = ((ChartPanel) chartPanel).getChart();
             XYPlot plot = (XYPlot) chart.getPlot();
-            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
-            int seriesCount = plot.getSeriesCount();
-            for (int i = 0; i < seriesCount; i++) {
-                renderer.setSeriesShapesVisible(i, false);
-            }
+            IntervalXYRenderer renderer = (IntervalXYRenderer) plot.getRenderer();
+            renderer.setBaseShapesVisible(false);
         }
     }
 
@@ -599,6 +601,8 @@ public class CIDAView extends FrameView {
         chartHomePanel = new javax.swing.JPanel();
         chartToolbar = new javax.swing.JToolBar();
         toggleLineTicksButton = new javax.swing.JToggleButton();
+        lineTickIntervalLabel = new javax.swing.JLabel();
+        lineTickIntervalInput = new javax.swing.JTextField();
         lineSeriesComboBox = new javax.swing.JComboBox();
         seriesColorButton = new javax.swing.JButton();
         seriesNameButton = new javax.swing.JButton();
@@ -888,6 +892,16 @@ public class CIDAView extends FrameView {
         toggleLineTicksButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         chartToolbar.add(toggleLineTicksButton);
 
+        lineTickIntervalLabel.setText(resourceMap.getString("lineTickIntervalLabel.text")); // NOI18N
+        lineTickIntervalLabel.setName("lineTickIntervalLabel"); // NOI18N
+        chartToolbar.add(lineTickIntervalLabel);
+
+        lineTickIntervalInput.setText(resourceMap.getString("lineTickIntervalInput.text")); // NOI18N
+        lineTickIntervalInput.setMinimumSize(new java.awt.Dimension(60, 27));
+        lineTickIntervalInput.setName("lineTickIntervalInput"); // NOI18N
+        lineTickIntervalInput.setPreferredSize(new java.awt.Dimension(60, 27));
+        chartToolbar.add(lineTickIntervalInput);
+
         lineSeriesComboBox.setModel(new javax.swing.DefaultComboBoxModel());
         lineSeriesComboBox.setName("lineSeriesComboBox"); // NOI18N
         chartToolbar.add(lineSeriesComboBox);
@@ -1122,6 +1136,8 @@ public class CIDAView extends FrameView {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JComboBox lineSeriesComboBox;
+    private javax.swing.JTextField lineTickIntervalInput;
+    private javax.swing.JLabel lineTickIntervalLabel;
     private javax.swing.JButton loadExperimentButton;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JButton mannWhitneyUTestButton;
