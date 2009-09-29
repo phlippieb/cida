@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2003 - 2008
+/**
+ * Copyright (C) 2009
  * Computational Intelligence Research Group (CIRG@UP)
  * Department of Computer Science
  * University of Pretoria
@@ -19,6 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 package cs.cirg.cida.io;
 
 import java.util.List;

@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2003 - 2008
+/**
+ * Copyright (C) 2009
  * Computational Intelligence Research Group (CIRG@UP)
  * Department of Computer Science
  * University of Pretoria
@@ -19,13 +19,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 package cs.cirg.cida.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class reads data from a local text based file. A row is a line in the text file,

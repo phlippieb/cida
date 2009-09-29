@@ -1,6 +1,9 @@
 /**
  * Copyright (C) 2009
- * Andrich van Wyk
+ * Computational Intelligence Research Group (CIRG@UP)
+ * Department of Computer Science
+ * University of Pretoria
+ * South Africa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +19,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 package cs.cirg.cida.analysis;
 
 import cs.cirg.cida.experiment.Experiment;
 import cs.cirg.cida.io.DataTable;
 import cs.cirg.cida.io.StandardDataTable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import jsc.independentsamples.MannWhitneyTest;
 import jsc.tests.H1;
 import net.sourceforge.cilib.type.types.StringType;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import sun.reflect.Reflection;
 
 /**
  *
