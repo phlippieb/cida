@@ -32,11 +32,6 @@ import cs.cirg.cida.components.SelectionListener;
 import cs.cirg.cida.components.SeriesPair;
 import cs.cirg.cida.experiment.Experiment;
 import cs.cirg.cida.experiment.ExperimentManager;
-import cs.cirg.cida.io.CSVFileWriter;
-import cs.cirg.cida.io.DataTable;
-import cs.cirg.cida.io.DataTableBuilder;
-import cs.cirg.cida.io.StandardDataTable;
-import cs.cirg.cida.io.exception.CIlibIOException;
 import java.awt.Color;
 import java.awt.Paint;
 import org.jdesktop.application.Action;
@@ -62,6 +57,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import net.sourceforge.cilib.io.CSVFileWriter;
+import net.sourceforge.cilib.io.DataTable;
+import net.sourceforge.cilib.io.DataTableBuilder;
+import net.sourceforge.cilib.io.StandardDataTable;
+import net.sourceforge.cilib.io.exception.CIlibIOException;
 import net.sourceforge.cilib.type.types.Numeric;
 import net.sourceforge.cilib.type.types.Real;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -84,7 +84,6 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class CIDAView extends FrameView {
 
-    private Object selectedExperimentItem;
     private Experiment selectedExperiment;
     private List<Integer> userSelectedRows;
     private List<Integer> userSelectedColumns;

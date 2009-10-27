@@ -23,8 +23,8 @@
 package cs.cirg.cida.analysis;
 
 import cs.cirg.cida.experiment.Experiment;
-import cs.cirg.cida.io.DataTable;
 import java.util.ArrayList;
+import net.sourceforge.cilib.io.DataTable;
 
 /**
  *

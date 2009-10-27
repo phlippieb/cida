@@ -23,10 +23,10 @@
 package cs.cirg.cida.experiment;
 
 import cs.cirg.cida.analysis.DescriptiveStatsCalculator;
-import cs.cirg.cida.io.StandardDataTable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.type.types.Numeric;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 

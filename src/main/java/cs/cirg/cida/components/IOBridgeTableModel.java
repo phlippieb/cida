@@ -22,8 +22,8 @@
 
 package cs.cirg.cida.components;
 
-import cs.cirg.cida.io.StandardDataTable;
 import javax.swing.table.AbstractTableModel;
+import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.type.types.Type;
 
 public class IOBridgeTableModel extends AbstractTableModel {

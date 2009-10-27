@@ -23,11 +23,11 @@
 package cs.cirg.cida.analysis;
 
 
-import cs.cirg.cida.io.DataTable;
-import cs.cirg.cida.io.exception.CIlibIOException;
-import cs.cirg.cida.io.transform.SelectiveDataOperator;
 import java.util.ArrayList;
 import java.util.List;
+import net.sourceforge.cilib.io.DataTable;
+import net.sourceforge.cilib.io.exception.CIlibIOException;
+import net.sourceforge.cilib.io.transform.SelectiveDataOperator;
 import net.sourceforge.cilib.type.types.Numeric;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 

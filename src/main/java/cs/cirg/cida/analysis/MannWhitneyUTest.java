@@ -23,11 +23,11 @@
 package cs.cirg.cida.analysis;
 
 import cs.cirg.cida.experiment.Experiment;
-import cs.cirg.cida.io.DataTable;
-import cs.cirg.cida.io.StandardDataTable;
 import java.util.ArrayList;
 import jsc.independentsamples.MannWhitneyTest;
 import jsc.tests.H1;
+import net.sourceforge.cilib.io.DataTable;
+import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.type.types.StringType;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 

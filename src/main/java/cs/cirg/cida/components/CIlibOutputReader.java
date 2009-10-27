@@ -22,10 +22,10 @@
 
 package cs.cirg.cida.components;
 
-import cs.cirg.cida.io.FileReader;
-import cs.cirg.cida.io.exception.CIlibIOException;
 import java.util.ArrayList;
 import java.util.List;
+import net.sourceforge.cilib.io.FileReader;
+import net.sourceforge.cilib.io.exception.CIlibIOException;
 import net.sourceforge.cilib.type.types.Int;
 import net.sourceforge.cilib.type.types.Real;
 import net.sourceforge.cilib.type.types.Type;

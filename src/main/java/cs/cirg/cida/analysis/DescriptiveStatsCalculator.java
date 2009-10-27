@@ -22,9 +22,9 @@
 
 package cs.cirg.cida.analysis;
 
-import cs.cirg.cida.io.StandardDataTable;
-import cs.cirg.cida.io.exception.CIlibIOException;
 import java.util.List;
+import net.sourceforge.cilib.io.StandardDataTable;
+import net.sourceforge.cilib.io.exception.CIlibIOException;
 import net.sourceforge.cilib.type.types.Numeric;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
