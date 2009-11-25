@@ -21,4 +21,4 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-nice java -server -Xms1000M -Xmx2000M -jar target/cida-1.0-SNAPSHOT.jar $@
+nice java -server -Xms1000M -Xmx2000M -jar cida-0.1.jar $@

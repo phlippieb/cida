@@ -19,12 +19,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida;
 
 import com.google.common.collect.Sets;
 import cs.cirg.cida.analysis.MannWhitneyUTest;
 import cs.cirg.cida.components.CIlibOutputReader;
+import cs.cirg.cida.components.ExceptionController;
 import cs.cirg.cida.components.SynopsisTableModel;
 import cs.cirg.cida.components.IOBridgeTableModel;
 import cs.cirg.cida.components.IntervalXYRenderer;
@@ -92,9 +92,12 @@ public class CIDAView extends FrameView {
     private List<String> testVariables;
     private String analysisName;
     private String startupDirectory;
+    private ExceptionController exceptionController;
 
     public CIDAView(SingleFrameApplication app) {
         super(app);
+
+        exceptionController = new ExceptionController();
 
         startupDirectory = ((CIDAApplication) app).getStartupDirectory();
         if (startupDirectory.charAt(startupDirectory.length() - 1) != '/') {
@@ -181,14 +184,19 @@ public class CIDAView extends FrameView {
                 for (File dataFile : files) {
                     String experimentName = dataFile.getName().substring(0, dataFile.getName().lastIndexOf("."));
                     if (editResultsNameCheckBox.isSelected()) {
-                        CIDADialog dialog = new CIDADialog(this.getFrame(), "Experiment name:", experimentName);
+                        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Experiment name:", experimentName);
+                        dialog.displayPrompt();
                         experimentName = dialog.getInput();
                     }
 
                     CIlibOutputReader reader = new CIlibOutputReader();
                     reader.setSourceURL(dataFile.getAbsolutePath());
                     DataTableBuilder dataTableBuilder = new DataTableBuilder(reader);
-                    dataTableBuilder.buildDataTable();
+                    try {
+                        dataTableBuilder.buildDataTable();
+                    } catch (NumberFormatException ex) {
+                        throw new CIlibIOException(ex);
+                    }
 
                     Experiment experiment = new Experiment(experimentManager.nextExperimentID(), (StandardDataTable<Numeric>) dataTableBuilder.getDataTable());
                     experiment.setDataSource(dataFile.getAbsolutePath());
@@ -200,7 +208,8 @@ public class CIDAView extends FrameView {
                     this.selectExperiment();
                 }
             } catch (CIlibIOException ex) {
-                ex.printStackTrace();
+                CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+                dialog.displayPrompt();
             }
         }
     }
@@ -253,7 +262,8 @@ public class CIDAView extends FrameView {
 
         int iterationsToAdd = statistics.size();
         if (!addAllRowsCheckBox.isSelected()) {
-            CIDADialog dialog = new CIDADialog(this.getFrame(), "Number of rows:", "" + iterationsToAdd);
+            CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Number of rows:", "" + iterationsToAdd);
+            dialog.displayPrompt();
             iterationsToAdd = Integer.parseInt(dialog.getInput());
         }
 
@@ -397,7 +407,8 @@ public class CIDAView extends FrameView {
                 writer.write(((IOBridgeTableModel) rawTable.getModel()).getDataTable());
                 writer.close();
             } catch (CIlibIOException ex) {
-                ex.printStackTrace();
+                CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+                dialog.displayPrompt();
             }
         }
     }
@@ -415,7 +426,8 @@ public class CIDAView extends FrameView {
                 writer.write(((IOBridgeTableModel) analysisTable.getModel()).getDataTable());
                 writer.close();
             } catch (CIlibIOException ex) {
-                ex.printStackTrace();
+                CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+                dialog.displayPrompt();
             }
         }
     }
@@ -514,7 +526,8 @@ public class CIDAView extends FrameView {
         JFreeChart chart = ((ChartPanel) chartPanel).getChart();
         XYPlot plot = (XYPlot) chart.getPlot();
         XYSeriesCollection xYSeriesCollection = (XYSeriesCollection) plot.getDataset();
-        CIDADialog dialog = new CIDADialog(this.getFrame(), "Enter new name: ", (String) xYSeriesCollection.getSeries(series.getValue()).getKey());
+        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Enter new name: ", (String) xYSeriesCollection.getSeries(series.getValue()).getKey());
+        dialog.displayPrompt();
         xYSeriesCollection.getSeries(series.getValue()).setKey(dialog.getInput());
         plot.notifyListeners(new PlotChangeEvent(plot));
         lineSeriesComboBox.removeItem(series);
@@ -547,7 +560,8 @@ public class CIDAView extends FrameView {
 
             g2d.finish();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
         }
     }
 
@@ -559,7 +573,8 @@ public class CIDAView extends FrameView {
         try {
             ChartUtilities.saveChartAsPNG(new File(name + ".png"), chartToSave, 800, 600);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
         }
     }
 

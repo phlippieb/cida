@@ -42,6 +42,7 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
         this.processHeader();
     }
     
+    @Override
     public List<Type> nextRow() {
         String line = null;
         if (firstDataLine != null) {
@@ -64,7 +65,7 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
         return columnNames;
     }
 
-    private void processHeader() {
+    private void processHeader() throws CIlibIOException {
         String line = this.nextLine();
         while (line.charAt(0)=='#') {
             int seperatorIndex = line.indexOf('-');
@@ -72,6 +73,10 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
             String columnName = line.substring(seperatorIndex + 2);
             columnNames.add(columnName);
             line = this.nextLine();
+            if (line == null) // this shouldn't happen, the next line after
+                throw new CIlibIOException("Unexpected end of file: " + // the header should contain data
+                        this.getFile().getName() +
+                        ", data expected after header.");
         }
         firstDataLine = line;
     }

@@ -19,64 +19,56 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
 /**
  *
  * @author andrich
  */
-public class CIDADialog extends JDialog {
-    private String prompt;
+public class CIDAInputDialog extends CIDAPromptDialog {
+
     private String input;
     private String defaultInput;
     private JTextField inputField;
 
-    public CIDADialog(Frame owner, String prompt, String defaultInput) {
-        super(owner, true);
-        this.prompt = prompt;
+    public CIDAInputDialog(Frame owner, String prompt, String defaultInput) {
+        super(owner, prompt);
         this.defaultInput = defaultInput;
-        init();
     }
 
-    private class DialogActionListener implements ActionListener {
-        private JDialog dialog;
+    protected class DialogActionListener extends CIDAPromptDialog.DialogActionListener {
 
-        public DialogActionListener(JDialog dialog) {
-            this.dialog = dialog;
+        public DialogActionListener() {
+            
         }
 
+        private DialogActionListener(CIDAInputDialog dialog) {
+            super(dialog);
+        }
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             input = inputField.getText();
-            dialog.dispose();
+            this.getDialog().dispose();
         }
-        
     }
 
-    private void init() {
-        this.setTitle("CIDA");
-        BorderLayout layout = new BorderLayout(5, 5);
-        this.setLayout(layout);
-        this.add(new JLabel(prompt), BorderLayout.NORTH);
-        inputField = new JTextField(defaultInput);
-        inputField.setFocusable(true);
-        this.add(inputField, BorderLayout.CENTER);
+    @Override
+    protected void addComponents() {
+        this.add(new JLabel(this.getPrompt()), BorderLayout.NORTH);
         JButton closeButton = new JButton("OK");
         closeButton.addActionListener(new DialogActionListener(this));
         this.add(closeButton, BorderLayout.SOUTH);
-        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        this.pack();
-        this.setVisible(true);
+        inputField = new JTextField(defaultInput);
+        inputField.setFocusable(true);
+        this.add(inputField, BorderLayout.CENTER);
     }
 
     public String getInput() {
