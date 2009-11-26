@@ -18,7 +18,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="testPanel" alignment="0" pref="970" max="32767" attributes="0"/>
+              <Component id="testPanel" alignment="0" pref="972" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -48,9 +48,9 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jSeparator1" alignment="0" pref="1044" max="32767" attributes="0"/>
-                              <Component id="jSeparator2" alignment="1" pref="1044" max="32767" attributes="0"/>
-                              <Component id="jScrollPane1" alignment="0" pref="1044" max="32767" attributes="0"/>
+                              <Component id="jSeparator1" alignment="0" pref="1036" max="32767" attributes="0"/>
+                              <Component id="jSeparator2" alignment="1" pref="1036" max="32767" attributes="0"/>
+                              <Component id="jScrollPane1" alignment="0" pref="1036" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="variablesLabel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -76,7 +76,7 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="editResultsNameCheckBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="192" max="32767" attributes="0"/>
+                                  <EmptySpace pref="184" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -117,7 +117,7 @@
                           <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
                           <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="471" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="461" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -292,8 +292,8 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="rawPanelToolbar" alignment="0" pref="1056" max="32767" attributes="0"/>
-                      <Component id="rawScrollPane" alignment="0" pref="1056" max="32767" attributes="0"/>
+                      <Component id="rawPanelToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="rawScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -301,7 +301,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="rawPanelToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="rawScrollPane" pref="896" max="32767" attributes="0"/>
+                          <Component id="rawScrollPane" pref="886" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -376,8 +376,8 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="analysisToolbar" alignment="0" pref="1056" max="32767" attributes="0"/>
-                      <Component id="analysisScrollPane" alignment="0" pref="1056" max="32767" attributes="0"/>
+                      <Component id="analysisToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="analysisScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -385,7 +385,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="analysisToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="analysisScrollPane" pref="896" max="32767" attributes="0"/>
+                          <Component id="analysisScrollPane" pref="886" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -487,8 +487,8 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="chartToolbar" alignment="0" pref="1056" max="32767" attributes="0"/>
-                      <Component id="chartScrollPane" alignment="0" pref="1056" max="32767" attributes="0"/>
+                      <Component id="chartToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="chartScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -496,7 +496,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="chartToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chartScrollPane" pref="908" max="32767" attributes="0"/>
+                          <Component id="chartScrollPane" pref="898" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -645,9 +645,9 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="testToolbar" alignment="0" pref="1056" max="32767" attributes="0"/>
-                      <Component id="testExperimentsScrollPane" alignment="0" pref="1056" max="32767" attributes="0"/>
-                      <Component id="testResultsScrollPane" alignment="0" pref="1056" max="32767" attributes="0"/>
+                      <Component id="testToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="testExperimentsScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="testResultsScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -655,9 +655,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="testToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="testExperimentsScrollPane" pref="390" max="32767" attributes="0"/>
+                          <Component id="testExperimentsScrollPane" pref="385" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="128" max="-2" attributes="0"/>
-                          <Component id="testResultsScrollPane" pref="390" max="32767" attributes="0"/>
+                          <Component id="testResultsScrollPane" pref="385" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -683,6 +683,20 @@
                           <Connection code="new javax.swing.DefaultComboBoxModel()" type="code"/>
                         </Property>
                         <Property name="name" type="java.lang.String" value="variablesTestComboBox" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel2">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel2.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JComboBox" name="hypothesisComboBox">
+                      <Properties>
+                        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="new javax.swing.DefaultComboBoxModel(new String[] { &quot;Not Equal&quot;, &quot;Less Than&quot;, &quot;Greater Than&quot;})" type="code"/>
+                        </Property>
+                        <Property name="name" type="java.lang.String" value="hypothesisComboBox" noResource="true"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JButton" name="mannWhitneyUTestButton">
@@ -831,7 +845,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusMessageLabel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="876" max="32767" attributes="0"/>
+                  <EmptySpace pref="878" max="32767" attributes="0"/>
                   <Component id="progressBar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusAnimationLabel" min="-2" max="-2" attributes="0"/>

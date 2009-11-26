@@ -19,7 +19,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida.experiment;
 
 import cs.cirg.cida.analysis.DescriptiveStatsCalculator;
@@ -76,7 +75,11 @@ public class Experiment {
             int size = columnNames.size();
             for (int i = 0; i < size; i++) {
                 String columnName = columnNames.get(i);
-                if (columnName.contains(variableName)) {
+                // if necesary strip the sample number: (X)
+                if (columnName.contains("(")) {
+                    columnName = columnName.substring(0, columnName.indexOf("(") - 1);
+                }
+                if (columnName.compareTo(variableName) == 0) {
                     selectedColumns.add(i);
                 }
             }

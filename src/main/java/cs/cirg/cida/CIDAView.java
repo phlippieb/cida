@@ -581,13 +581,23 @@ public class CIDAView extends FrameView {
     @Action
     public void runMannWhitneyUTest() {
         if (testExperiments.size() > 2) {
-            System.out.println("Mann Whitney U test is only applicable to 2 experiments.");
+            CIDAPromptDialog dialog = new CIDAPromptDialog(this.getFrame(), "Mann Whitney U test is only applicable to 2 experiments.");
+            dialog.displayPrompt();
             return;
         }
         MannWhitneyUTest test = new MannWhitneyUTest();
         for (Experiment experiment : testExperiments) {
             test.addExperiment(experiment);
         }
+        
+        if (((String) hypothesisComboBox.getSelectedItem()).compareTo("Not Equal") == 0) {
+            test.setAlternativeHypothesisNotEquals();
+        } else if (((String) hypothesisComboBox.getSelectedItem()).compareTo("Less Than") == 0) {
+            test.setAlternativeHypothesisLessThan();
+        } else {
+            test.setAlternativeHypothesisGreaterThan();
+        }
+
         test.performTest((String) variablesTestComboBox.getSelectedItem());
         DataTable table = test.getResults();
         IOBridgeTableModel model = new IOBridgeTableModel();
@@ -651,6 +661,8 @@ public class CIDAView extends FrameView {
         testToolbar = new javax.swing.JToolBar();
         jLabel1 = new javax.swing.JLabel();
         variablesTestComboBox = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        hypothesisComboBox = new javax.swing.JComboBox();
         mannWhitneyUTestButton = new javax.swing.JButton();
         testExperimentsScrollPane = new javax.swing.JScrollPane();
         testExperimentsTable = new javax.swing.JTable();
@@ -748,9 +760,9 @@ public class CIDAView extends FrameView {
             .add(homePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1044, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1044, Short.MAX_VALUE)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1044, Short.MAX_VALUE)
+                    .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
                     .add(homePanelLayout.createSequentialGroup()
                         .add(variablesLabel)
                         .add(18, 18, 18)
@@ -773,7 +785,7 @@ public class CIDAView extends FrameView {
                             .add(org.jdesktop.layout.GroupLayout.LEADING, loadExperimentButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(editResultsNameCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 192, Short.MAX_VALUE)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 184, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         homePanelLayout.setVerticalGroup(
@@ -806,7 +818,7 @@ public class CIDAView extends FrameView {
                 .add(51, 51, 51)
                 .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -839,15 +851,15 @@ public class CIDAView extends FrameView {
         rawPanel.setLayout(rawPanelLayout);
         rawPanelLayout.setHorizontalGroup(
             rawPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(rawPanelToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
-            .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
+            .add(rawPanelToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
         );
         rawPanelLayout.setVerticalGroup(
             rawPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(rawPanelLayout.createSequentialGroup()
                 .add(rawPanelToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 896, Short.MAX_VALUE)
+                .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 886, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -902,15 +914,15 @@ public class CIDAView extends FrameView {
         analysisPanel.setLayout(analysisPanelLayout);
         analysisPanelLayout.setHorizontalGroup(
             analysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(analysisToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
-            .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
+            .add(analysisToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
         );
         analysisPanelLayout.setVerticalGroup(
             analysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(analysisPanelLayout.createSequentialGroup()
                 .add(analysisToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 896, Short.MAX_VALUE)
+                .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 886, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -996,15 +1008,15 @@ public class CIDAView extends FrameView {
         chartHomePanel.setLayout(chartHomePanelLayout);
         chartHomePanelLayout.setHorizontalGroup(
             chartHomePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(chartToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
-            .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
+            .add(chartToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
         );
         chartHomePanelLayout.setVerticalGroup(
             chartHomePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(chartHomePanelLayout.createSequentialGroup()
                 .add(chartToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 908, Short.MAX_VALUE))
+                .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 898, Short.MAX_VALUE))
         );
 
         testPanel.addTab(resourceMap.getString("chartHomePanel.TabConstraints.tabTitle"), chartHomePanel); // NOI18N
@@ -1021,6 +1033,14 @@ public class CIDAView extends FrameView {
         variablesTestComboBox.setModel(new javax.swing.DefaultComboBoxModel());
         variablesTestComboBox.setName("variablesTestComboBox"); // NOI18N
         testToolbar.add(variablesTestComboBox);
+
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
+        testToolbar.add(jLabel2);
+
+        hypothesisComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Not Equal", "Less Than", "Greater Than"}));
+        hypothesisComboBox.setName("hypothesisComboBox"); // NOI18N
+        testToolbar.add(hypothesisComboBox);
 
         mannWhitneyUTestButton.setAction(actionMap.get("runMannWhitneyUTest")); // NOI18N
         mannWhitneyUTestButton.setText(resourceMap.getString("mannWhitneyUTestButton.text")); // NOI18N
@@ -1051,18 +1071,18 @@ public class CIDAView extends FrameView {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(testToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
-            .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
-            .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
+            .add(testToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(testToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+                .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
                 .add(128, 128, 128)
-                .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE))
+                .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
         );
 
         testPanel.addTab(resourceMap.getString("jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
@@ -1075,7 +1095,7 @@ public class CIDAView extends FrameView {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 970, Short.MAX_VALUE)
+            .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE)
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -1117,7 +1137,7 @@ public class CIDAView extends FrameView {
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 876, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 878, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -1167,7 +1187,9 @@ public class CIDAView extends FrameView {
     private javax.swing.JButton exportEPSButton;
     private javax.swing.JButton exportPNGButton;
     private javax.swing.JPanel homePanel;
+    private javax.swing.JComboBox hypothesisComboBox;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;

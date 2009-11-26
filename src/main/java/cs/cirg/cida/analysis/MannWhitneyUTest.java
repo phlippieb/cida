@@ -37,6 +37,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
  */
 public class MannWhitneyUTest extends StatisticalTest {
 
+    private H1 alternativeHypothesis;
+
     @Override
     public DataTable performTest(String... variableNames) {
         if (this.getExperiments().size() < 2) {
@@ -54,10 +56,8 @@ public class MannWhitneyUTest extends StatisticalTest {
             xA[i] = stats1.getElement(i);
             xB[i] = stats2.getElement(i);
         }
-        //System.out.println(Arrays.toString(xA));
-        //System.out.println(Arrays.toString(xB));
-        H1 h1 = H1.NOT_EQUAL;
-        MannWhitneyTest mannWhitneyTest = new MannWhitneyTest(xA, xB, h1, 0.0, false);
+
+        MannWhitneyTest mannWhitneyTest = new MannWhitneyTest(xA, xB, alternativeHypothesis, 0.0, false);
 
         results = new StandardDataTable<StringType>();
 
@@ -105,5 +105,16 @@ public class MannWhitneyUTest extends StatisticalTest {
         results.setColumnName(1, "Value");
 
         return this.getResults();
+    }
+
+    public void setAlternativeHypothesisNotEquals() {
+        this.alternativeHypothesis = H1.NOT_EQUAL;
+    }
+
+    public void setAlternativeHypothesisLessThan() {
+        this.alternativeHypothesis = H1.LESS_THAN;
+    }
+    public void setAlternativeHypothesisGreaterThan() {
+        this.alternativeHypothesis = H1.GREATER_THAN;
     }
 }
