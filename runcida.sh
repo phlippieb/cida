@@ -21,11 +21,13 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-if [ -f target/cida-0.1.jar ]; then
-    nice java -server -Xms1000M -Xmx2000M -jar target/cida-0.1.jar $@
+CIDA_VERSION=0.1.1
+
+if [ -f target/cida-$CIDA_VERSION.jar ]; then
+    nice java -server -Xms1000M -Xmx2000M -jar target/cida-$CIDA_VERSION.jar $@
 else
-    if [ -f cida-0.1.jar ]; then
-        nice java -server -Xms1000M -Xmx2000M -jar cida-0.1.jar $@
+    if [ -f cida-$CIDA_VERSION.jar ]; then
+        nice java -server -Xms1000M -Xmx2000M -jar cida-$CIDA_VERSION.jar $@
     else
         echo "CIDA jar not found."
     fi
