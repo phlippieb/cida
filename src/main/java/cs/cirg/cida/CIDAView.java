@@ -33,6 +33,8 @@ import cs.cirg.cida.experiment.ExperimentController;
 import java.awt.Color;
 import java.awt.Paint;
 import javax.swing.JTable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -41,10 +43,13 @@ import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Timer;
@@ -299,6 +304,66 @@ public class CIDAView extends FrameView {
     }
 
     @Action
+    public void exportTable() {
+        DecimalFormat formatter = new DecimalFormat("#.#####");
+        BufferedWriter writer = null;
+        try {
+            File file = new File("table.tex");
+            writer = new BufferedWriter(new FileWriter(file));
+
+            writer.write("\\begin{table}[htb]\n");
+            writer.write("\\begin{center}\n");
+            writer.write("\\begin{tabular}{");
+            int numCols = synopsisTable.getColumnCount();
+            for (int i = 0; i < numCols; i++) {
+                writer.write(" | c");
+            }
+            writer.write(" |");
+            writer.write("}\n");
+            writer.write("\\hline\\hline\n");
+            writer.write("{\\bf " + synopsisTable.getModel().getColumnName(0) + "}");
+            for (int i = 1; i < numCols; i++) {
+                writer.write(" & {\\bf " + synopsisTable.getModel().getColumnName(i) + "}");
+            }
+            writer.write("\\\\\n");
+            writer.write("\\hline\n");
+
+            int numRows = synopsisTable.getRowCount();
+            for (int i = 0; i < numRows; i++) {
+                Object value = synopsisTable.getModel().getValueAt(i, 0);
+                if (value instanceof Number) {
+                    value = formatter.format(value);
+                }
+                writer.write(value.toString());
+                for (int j = 1; j < numCols; j++) {
+                    value = synopsisTable.getModel().getValueAt(i, j);
+                    if (value instanceof Number) {
+                        value = formatter.format(value);
+                    }
+                    writer.write(" & " + value.toString());
+                }
+                writer.write("\\\\\n");
+                writer.write("\\hline\n");
+            }
+            writer.write("\\hline\\hline\n");
+            writer.write("\\end{tabular}\n");
+            writer.write("\\end{center}\n");
+            writer.write("\\end{table}\n");
+            writer.flush();
+            writer.close();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                writer.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    @Action
     public void clearAnalysisTable() {
         analysisTable.setModel(new IOBridgeTableModel());
     }
@@ -549,6 +614,7 @@ public class CIDAView extends FrameView {
         addAllRowsCheckBox = new javax.swing.JCheckBox();
         addAllVariablesAnalysisButton = new javax.swing.JButton();
         addAllVariablesSynopsisButton = new javax.swing.JButton();
+        exportTableButton = new javax.swing.JButton();
         rawPanel = new javax.swing.JPanel();
         rawPanelToolbar = new javax.swing.JToolBar();
         exportDataButton = new javax.swing.JButton();
@@ -670,6 +736,10 @@ public class CIDAView extends FrameView {
         addAllVariablesSynopsisButton.setText(resourceMap.getString("addAllVariablesSynopsisButton.text")); // NOI18N
         addAllVariablesSynopsisButton.setName("addAllVariablesSynopsisButton"); // NOI18N
 
+        exportTableButton.setAction(actionMap.get("exportTable")); // NOI18N
+        exportTableButton.setText(resourceMap.getString("exportTableButton.text")); // NOI18N
+        exportTableButton.setName("exportTableButton"); // NOI18N
+
         org.jdesktop.layout.GroupLayout homePanelLayout = new org.jdesktop.layout.GroupLayout(homePanel);
         homePanel.setLayout(homePanelLayout);
         homePanelLayout.setHorizontalGroup(
@@ -689,7 +759,8 @@ public class CIDAView extends FrameView {
                             .add(addToSynopsisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(addAllVariablesAnalysisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(addAllVariablesSynopsisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, addToAnalysisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, addToAnalysisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(exportTableButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addAllRowsCheckBox))
                     .add(homePanelLayout.createSequentialGroup()
@@ -732,7 +803,9 @@ public class CIDAView extends FrameView {
                 .add(addAllVariablesAnalysisButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(addAllVariablesSynopsisButton)
-                .add(51, 51, 51)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(exportTableButton)
+                .add(10, 10, 10)
                 .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
@@ -1101,6 +1174,7 @@ public class CIDAView extends FrameView {
     private javax.swing.JButton exportDataButton;
     private javax.swing.JButton exportEPSButton;
     private javax.swing.JButton exportPNGButton;
+    private javax.swing.JButton exportTableButton;
     private javax.swing.JPanel homePanel;
     private javax.swing.JComboBox hypothesisComboBox;
     private javax.swing.JLabel jLabel1;

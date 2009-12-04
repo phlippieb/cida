@@ -61,6 +61,7 @@
                                       <Component id="addAllVariablesAnalysisButton" alignment="0" max="32767" attributes="1"/>
                                       <Component id="addAllVariablesSynopsisButton" alignment="0" max="32767" attributes="1"/>
                                       <Component id="addToAnalysisButton" alignment="1" max="32767" attributes="1"/>
+                                      <Component id="exportTableButton" alignment="0" max="32767" attributes="1"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="addAllRowsCheckBox" min="-2" max="-2" attributes="0"/>
@@ -114,7 +115,9 @@
                           <Component id="addAllVariablesAnalysisButton" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="addAllVariablesSynopsisButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="exportTableButton" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jScrollPane1" pref="461" max="32767" attributes="0"/>
@@ -276,6 +279,15 @@
                     </Property>
                     <Property name="text" type="java.lang.String" resourceKey="addAllVariablesSynopsisButton.text"/>
                     <Property name="name" type="java.lang.String" value="addAllVariablesSynopsisButton" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="exportTableButton">
+                  <Properties>
+                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                      <action class="cs.cirg.cida.CIDAView" id="exportTable" methodName="exportTable"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" resourceKey="exportTableButton.text"/>
+                    <Property name="name" type="java.lang.String" value="exportTableButton" noResource="true"/>
                   </Properties>
                 </Component>
               </SubComponents>
