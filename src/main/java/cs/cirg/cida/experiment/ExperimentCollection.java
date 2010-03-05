@@ -30,13 +30,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author andrich
  */
-public class ExperimentManager {
+public class ExperimentCollection {
 
-    private List<Experiment> experiments;
+    private List<DataTableExperiment> experiments;
     private AtomicInteger idCounter;
 
-    private ExperimentManager() {
-        experiments = new ArrayList<Experiment>();
+    public ExperimentCollection() {
+        experiments = new ArrayList<DataTableExperiment>();
         idCounter = new AtomicInteger(0);
     }
 
@@ -44,37 +44,37 @@ public class ExperimentManager {
         return idCounter.incrementAndGet();
     }
 
-    public void addExperiment(Experiment experiment) {
+    public void clear() {
+        experiments.clear();
+        idCounter = new AtomicInteger(0);
+    }
+
+    public List<DataTableExperiment> getExperiments() {
+        return experiments;
+    }
+
+    public void addExperiment(DataTableExperiment experiment) {
         experiment.initialise();
         experiments.add(experiment);
     }
 
-    public List<Experiment> getExperiments() {
-        return experiments;
+    public boolean removeExperiment(DataTableExperiment experiment) {
+        return experiments.remove(experiment);
     }
 
-    public Experiment getExperiment(String name) {
-        for (Experiment experiment : experiments) {
+    public DataTableExperiment getExperiment(String name) {
+        for (DataTableExperiment experiment : experiments) {
             if (experiment.getName().equals(name))
                 return experiment;
         }
         return null;
     }
 
-    public Experiment getExperiment(int id) {
-        for (Experiment experiment : experiments) {
+    public DataTableExperiment getExperiment(int id) {
+        for (DataTableExperiment experiment : experiments) {
             if (experiment.getId() == id)
                 return experiment;
         }
         return null;
-    }
-
-    public static ExperimentManager getInstance() {
-        return ExperimentManagerHolder.INSTANCE;
-    }
-
-    private static class ExperimentManagerHolder {
-
-        private static final ExperimentManager INSTANCE = new ExperimentManager();
     }
 }

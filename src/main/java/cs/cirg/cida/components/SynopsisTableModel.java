@@ -22,7 +22,7 @@
 
 package cs.cirg.cida.components;
 
-import cs.cirg.cida.experiment.Experiment;
+import cs.cirg.cida.experiment.DataTableExperiment;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -34,11 +34,11 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
  */
 public class SynopsisTableModel extends AbstractTableModel {
 
-    List<Experiment> experiments;
+    List<DataTableExperiment> experiments;
     List<String> variables;
 
     public SynopsisTableModel() {
-        experiments = new ArrayList<Experiment>();
+        experiments = new ArrayList<DataTableExperiment>();
         variables = new ArrayList<String>();
     }
 
@@ -79,11 +79,11 @@ public class SynopsisTableModel extends AbstractTableModel {
         return descriptiveStatistics.getStandardDeviation();
     }
 
-    public List<Experiment> getExperiments() {
+    public List<DataTableExperiment> getExperiments() {
         return experiments;
     }
 
-    public void setExperiments(List<Experiment> experiments) {
+    public void setExperiments(List<DataTableExperiment> experiments) {
         this.experiments = experiments;
     }
 

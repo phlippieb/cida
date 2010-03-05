@@ -22,7 +22,7 @@
 
 package cs.cirg.cida.analysis;
 
-import cs.cirg.cida.experiment.Experiment;
+import cs.cirg.cida.experiment.DataTableExperiment;
 import java.util.ArrayList;
 import net.sourceforge.cilib.io.DataTable;
 
@@ -32,24 +32,24 @@ import net.sourceforge.cilib.io.DataTable;
  */
 public abstract class StatisticalTest {
 
-    protected ArrayList<Experiment> experiments;
+    protected ArrayList<DataTableExperiment> experiments;
     protected DataTable results;
 
     public StatisticalTest() {
-        experiments = new ArrayList<Experiment>();
+        experiments = new ArrayList<DataTableExperiment>();
     }
 
-    public void addExperiment(Experiment experiment) {
+    public void addExperiment(DataTableExperiment experiment) {
         experiments.add(experiment);
     }
 
     public abstract DataTable performTest(String... variableNames);
 
-    public ArrayList<Experiment> getExperiments() {
+    public ArrayList<DataTableExperiment> getExperiments() {
         return experiments;
     }
 
-    public void setExperiments(ArrayList<Experiment> experiments) {
+    public void setExperiments(ArrayList<DataTableExperiment> experiments) {
         this.experiments = experiments;
     }
 

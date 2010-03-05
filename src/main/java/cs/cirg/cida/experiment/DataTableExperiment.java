@@ -33,23 +33,24 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
  *
  * @author andrich
  */
-public class Experiment {
+public class DataTableExperiment implements IExperiment {
 
     private StandardDataTable<Numeric> data;
     private HashMap<String, List<DescriptiveStatistics>> variableStatistics;
     private List<String> variableNames;
-    private String name;
+    private String experimentName;
     private String dataSource;
     private int id;
 
-    public Experiment(int id, StandardDataTable<Numeric> dataTable) {
+    public DataTableExperiment(int id, StandardDataTable<Numeric> dataTable) {
         data = dataTable;
         variableStatistics = new HashMap<String, List<DescriptiveStatistics>>();
-        name = "experiment";
+        experimentName = "experiment";
         dataSource = "";
         this.id = id;
     }
 
+    @Override
     public void initialise() {
         this.determineVariableNames();
         this.calculateStatistics();
@@ -98,7 +99,7 @@ public class Experiment {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Experiment other = (Experiment) obj;
+        final DataTableExperiment other = (DataTableExperiment) obj;
         if (this.id != other.id) {
             return false;
         }
@@ -112,59 +113,73 @@ public class Experiment {
         return hash;
     }
 
+    @Override
     public List<Numeric> getIterationColumn() {
         return data.getColumn(0);
     }
 
-    public List<Numeric> getFinalIteration() {
-        return data.getRow(data.getNumRows() - 1);
-    }
-
+    @Override
     public StandardDataTable<Numeric> getData() {
         return data;
     }
 
+    @Override
     public void setData(StandardDataTable<Numeric> data) {
         this.data = data;
     }
 
+    @Override
     public String getName() {
-        return name;
+        return experimentName;
     }
 
+    @Override
     public void setName(String name) {
-        this.name = name;
+        this.experimentName = name;
     }
 
+    @Override
     public String getDataSource() {
         return dataSource;
     }
 
+    @Override
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;
     }
 
+    @Override
     public int getId() {
         return id;
     }
 
+    @Override
     public void setId(int id) {
         this.id = id;
     }
 
+    @Override
     public List<String> getVariableNames() {
         return variableNames;
     }
 
+    @Override
     public void setVariableNames(List<String> variableNames) {
         this.variableNames = variableNames;
     }
 
+    @Override
     public List<DescriptiveStatistics> getStatistics(String variableName) {
         return variableStatistics.get(variableName);
     }
 
-    public DescriptiveStatistics getFinalIterationStatistics(String variableName) {
+    @Override
+    public List<Numeric> getBottomRow() {
+        return data.getRow(data.getNumRows() - 1);
+    }
+
+    @Override
+    public DescriptiveStatistics getBottomRowStatistics(String variableName) {
         int size = variableStatistics.get(variableName).size();
         return variableStatistics.get(variableName).get(size - 1);
     }

@@ -22,7 +22,7 @@
 
 package cs.cirg.cida.analysis;
 
-import cs.cirg.cida.experiment.Experiment;
+import cs.cirg.cida.experiment.DataTableExperiment;
 import java.util.ArrayList;
 import jsc.independentsamples.MannWhitneyTest;
 import jsc.tests.H1;
@@ -44,8 +44,8 @@ public class MannWhitneyUTest extends StatisticalTest {
         if (this.getExperiments().size() < 2) {
             return null;
         }
-        Experiment experiment1 = this.getExperiments().get(0);
-        Experiment experiment2 = this.getExperiments().get(1);
+        DataTableExperiment experiment1 = this.getExperiments().get(0);
+        DataTableExperiment experiment2 = this.getExperiments().get(1);
 
         DescriptiveStatistics stats1 = experiment1.getFinalIterationStatistics(variableNames[0]);
         DescriptiveStatistics stats2 = experiment2.getFinalIterationStatistics(variableNames[0]);

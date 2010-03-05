@@ -30,8 +30,8 @@ import cs.cirg.cida.components.IOBridgeTableModel;
 import cs.cirg.cida.components.IntervalXYRenderer;
 import cs.cirg.cida.components.SelectionListener;
 import cs.cirg.cida.components.SeriesPair;
-import cs.cirg.cida.experiment.Experiment;
-import cs.cirg.cida.experiment.ExperimentManager;
+import cs.cirg.cida.experiment.DataTableExperiment;
+import cs.cirg.cida.experiment.ExperimentCollection;
 import java.awt.Color;
 import java.awt.Paint;
 import org.jdesktop.application.Action;
@@ -84,14 +84,12 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class CIDAView extends FrameView {
 
-    private Experiment selectedExperiment;
+    private DataTableExperiment selectedExperiment;
     private List<Integer> userSelectedRows;
     private List<Integer> userSelectedColumns;
-    private ExperimentManager experimentManager;
-    private List<Experiment> testExperiments;
+    private ExperimentCollection experimentManager;
+    private List<DataTableExperiment> testExperiments;
     private List<String> testVariables;
-    private String analysisName;
-    private String startupDirectory;
     private ExceptionController exceptionController;
 
     public CIDAView(SingleFrameApplication app) {
@@ -105,9 +103,9 @@ public class CIDAView extends FrameView {
         }
         userSelectedRows = new ArrayList<Integer>();
         userSelectedColumns = new ArrayList<Integer>();
-        testExperiments = new ArrayList<Experiment>();
+        testExperiments = new ArrayList<DataTableExperiment>();
         testVariables = new ArrayList<String>();
-        experimentManager = ExperimentManager.getInstance();
+        experimentManager = new ExperimentCollection();
         analysisName = "";
 
         initComponents();
@@ -198,7 +196,7 @@ public class CIDAView extends FrameView {
                         throw new CIlibIOException(ex);
                     }
 
-                    Experiment experiment = new Experiment(experimentManager.nextExperimentID(), (StandardDataTable<Numeric>) dataTableBuilder.getDataTable());
+                    DataTableExperiment experiment = new DataTableExperiment(experimentManager.nextExperimentID(), (StandardDataTable<Numeric>) dataTableBuilder.getDataTable());
                     experiment.setDataSource(dataFile.getAbsolutePath());
                     experiment.setName(experimentName);
                     experimentManager.addExperiment(experiment);
@@ -248,7 +246,7 @@ public class CIDAView extends FrameView {
         addVariableToAnalysis(selectedExperiment, variableName);
     }
 
-    public void addVariableToAnalysis(Experiment experiment, String variableName) {
+    public void addVariableToAnalysis(DataTableExperiment experiment, String variableName) {
         if (!analysisName.contains(experiment.getName())) {
             analysisName = experiment.getName() + "_" + analysisName;
         }
@@ -314,7 +312,7 @@ public class CIDAView extends FrameView {
         addVariableToSynopsisTable(selectedExperiment, variableName);
     }
 
-    public void addVariableToSynopsisTable(Experiment experiment, String variable) {
+    public void addVariableToSynopsisTable(DataTableExperiment experiment, String variable) {
         SynopsisTableModel model = (SynopsisTableModel) synopsisTable.getModel();
 
         if (!model.getVariables().contains(variable)) {
@@ -357,7 +355,7 @@ public class CIDAView extends FrameView {
         addExperimentToTest(selectedExperiment);
     }
 
-    public void addExperimentToTest(Experiment experiment) {
+    public void addExperimentToTest(DataTableExperiment experiment) {
         if (selectedExperiment == null) {
             return;
         }
@@ -586,7 +584,7 @@ public class CIDAView extends FrameView {
             return;
         }
         MannWhitneyUTest test = new MannWhitneyUTest();
-        for (Experiment experiment : testExperiments) {
+        for (DataTableExperiment experiment : testExperiments) {
             test.addExperiment(experiment);
         }
         
