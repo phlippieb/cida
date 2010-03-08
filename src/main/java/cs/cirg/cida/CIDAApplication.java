@@ -19,7 +19,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida;
 
 import java.io.File;
@@ -59,20 +58,23 @@ public class CIDAApplication extends SingleFrameApplication {
             }
         }
 
-
-        String homeDir = System.getenv("HOME");
         if (args.length > 0) {
             startupDirectory = args[0];
+            File file = new File(startupDirectory);
+            if (!(file.exists() && file.isDirectory())) {
+                System.out.println("Usage: CIDA [directory]");
+                System.out.println("where diretory is:");
+                System.out.println("A valid system directory that CIDA will use as the default directory to load data files from;");
+                System.out.println("if no directory is specified, then the user's home directory is used.");
+                System.exit(1);
+            }
         } else {
+            String homeDir = System.getenv("HOME");
             startupDirectory = homeDir;
-        }
-        File file = new File(startupDirectory);
-        if (!file.isDirectory()) {
-            System.out.println("Usage: CIDA [directory]");
-            System.out.println("where diretory is:");
-            System.out.println("A valid system directory that CIDA will use as the default directory to load data files from;");
-            System.out.println("if no directory is specified, then the user's home directory is used.");
-            System.exit(1);
+            File file = new File(startupDirectory);
+            if (!(file.exists() && file.isDirectory())) {
+                startupDirectory = ".";
+            }
         }
     }
 

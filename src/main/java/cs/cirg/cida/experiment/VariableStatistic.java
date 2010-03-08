@@ -22,29 +22,39 @@
 
 package cs.cirg.cida.experiment;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.cilib.type.types.Real;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
  *
  * @author andrich
  */
-public class VariableStatistic {
+public enum VariableStatistic {
 
-    public static enum Statistic {
-        MEAN, STDDEV, NORMMEAN
-    }
+    Mean {
+        @Override
+        public List<Real> getStatistic(List<DescriptiveStatistics> stats) {
+            int size = stats.size();
+            List<Real> statList = new ArrayList<Real>(size);
+            for (int i = 0; i < size; i++) {
+                statList.add(new Real(stats.get(i).getMean()));
+            }
+            return statList;
+        }
+    },
+    StdDev {
+        @Override
+        public List<Real> getStatistic(List<DescriptiveStatistics> stats) {
+            int size = stats.size();
+            List<Real> statList = new ArrayList<Real>(size);
+            for (int i = 0; i < size; i++) {
+                statList.add(new Real(stats.get(i).getStandardDeviation()));
+            }
+            return statList;
+        }
+    };
 
-    public String variable;
-    public Statistic stat;
-    public List<Real> values;
-
-    public static String makeDescriptor(String variableName, Statistic statistic) {
-        return variableName + "." + statistic;
-    }
-
-    public String getDescriptor() {
-        return makeDescriptor(variable, stat);
-    }
-
+    public abstract List<Real> getStatistic(List<DescriptiveStatistics> stats);
 }

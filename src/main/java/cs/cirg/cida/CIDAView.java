@@ -21,19 +21,18 @@
  */
 package cs.cirg.cida;
 
-import com.google.common.collect.Sets;
-import cs.cirg.cida.analysis.MannWhitneyUTest;
-import cs.cirg.cida.components.CIlibOutputReader;
 import cs.cirg.cida.components.ExceptionController;
 import cs.cirg.cida.components.SynopsisTableModel;
 import cs.cirg.cida.components.IOBridgeTableModel;
 import cs.cirg.cida.components.IntervalXYRenderer;
 import cs.cirg.cida.components.SelectionListener;
 import cs.cirg.cida.components.SeriesPair;
-import cs.cirg.cida.experiment.DataTableExperiment;
-import cs.cirg.cida.experiment.ExperimentCollection;
+import cs.cirg.cida.exception.CIDAException;
+import cs.cirg.cida.experiment.ExperimentAnalysisModel;
+import cs.cirg.cida.experiment.ExperimentController;
 import java.awt.Color;
 import java.awt.Paint;
+import javax.swing.JTable;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -48,23 +47,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import net.sourceforge.cilib.io.CSVFileWriter;
-import net.sourceforge.cilib.io.DataTable;
-import net.sourceforge.cilib.io.DataTableBuilder;
 import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.io.exception.CIlibIOException;
 import net.sourceforge.cilib.type.types.Numeric;
-import net.sourceforge.cilib.type.types.Real;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.xmlgraphics.java2d.GraphicContext;
 import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.jfree.chart.ChartFactory;
@@ -84,29 +78,20 @@ import org.jfree.data.xy.XYSeriesCollection;
  */
 public class CIDAView extends FrameView {
 
-    private DataTableExperiment selectedExperiment;
+    private ExceptionController exceptionController;
+    private ExperimentController experimentController;
+    //private DataTableExperiment selectedExperiment;
     private List<Integer> userSelectedRows;
     private List<Integer> userSelectedColumns;
-    private ExperimentCollection experimentManager;
-    private List<DataTableExperiment> testExperiments;
-    private List<String> testVariables;
-    private ExceptionController exceptionController;
 
     public CIDAView(SingleFrameApplication app) {
         super(app);
 
         exceptionController = new ExceptionController();
+        experimentController = new ExperimentController(this, new ExperimentAnalysisModel(((CIDAApplication) app).getStartupDirectory()));
 
-        startupDirectory = ((CIDAApplication) app).getStartupDirectory();
-        if (startupDirectory.charAt(startupDirectory.length() - 1) != '/') {
-            startupDirectory += '/';
-        }
         userSelectedRows = new ArrayList<Integer>();
         userSelectedColumns = new ArrayList<Integer>();
-        testExperiments = new ArrayList<DataTableExperiment>();
-        testVariables = new ArrayList<String>();
-        experimentManager = new ExperimentCollection();
-        analysisName = "";
 
         initComponents();
 
@@ -170,7 +155,7 @@ public class CIDAView extends FrameView {
 
     @Action
     public void loadExperiment() {
-        JFileChooser chooser = new JFileChooser(startupDirectory);
+        JFileChooser chooser = new JFileChooser(experimentController.getDataDirectory());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
                 "Text and CSV files", "txt", "csv");
         chooser.setFileFilter(filter);
@@ -179,32 +164,20 @@ public class CIDAView extends FrameView {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
                 File[] files = chooser.getSelectedFiles();
-                for (File dataFile : files) {
-                    String experimentName = dataFile.getName().substring(0, dataFile.getName().lastIndexOf("."));
+                String[] experimentNames = null;
+                experimentNames = new String[files.length];
+                for (int i = 0; i < files.length; ++i) {
+                    File dataFile = files[i];
+                    String tmpName = dataFile.getName().substring(0, dataFile.getName().lastIndexOf("."));
                     if (editResultsNameCheckBox.isSelected()) {
-                        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Experiment name:", experimentName);
+                        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Rename experiment:", tmpName);
                         dialog.displayPrompt();
-                        experimentName = dialog.getInput();
+                        tmpName = dialog.getInput();
                     }
-
-                    CIlibOutputReader reader = new CIlibOutputReader();
-                    reader.setSourceURL(dataFile.getAbsolutePath());
-                    DataTableBuilder dataTableBuilder = new DataTableBuilder(reader);
-                    try {
-                        dataTableBuilder.buildDataTable();
-                    } catch (NumberFormatException ex) {
-                        throw new CIlibIOException(ex);
-                    }
-
-                    DataTableExperiment experiment = new DataTableExperiment(experimentManager.nextExperimentID(), (StandardDataTable<Numeric>) dataTableBuilder.getDataTable());
-                    experiment.setDataSource(dataFile.getAbsolutePath());
-                    experiment.setName(experimentName);
-                    experimentManager.addExperiment(experiment);
-                    experimentsComboBox.addItem(experimentName);
-                    experimentsComboBox.setSelectedItem(experimentName);
-
-                    this.selectExperiment();
+                    experimentNames[i] = tmpName;
                 }
+                experimentController.addExperiments(files, experimentNames);
+                this.selectExperiment();
             } catch (CIlibIOException ex) {
                 CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
                 dialog.displayPrompt();
@@ -218,85 +191,37 @@ public class CIDAView extends FrameView {
             return;
         }
         String selectedExperimentName = (String) experimentsComboBox.getSelectedItem();
-        selectedExperiment = null;
-        selectedExperiment = experimentManager.getExperiment(selectedExperimentName);
-        List<String> variableNames = selectedExperiment.getVariableNames();
-        variablesComboBox.removeAllItems();
-        for (String variableName : variableNames) {
-            variablesComboBox.addItem(variableName);
+        try {
+            experimentController.setActiveExperiment(selectedExperimentName);
+        } catch (CIDAException ex) {
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
         }
-
-        IOBridgeTableModel model = new IOBridgeTableModel();
-        model.setDataTable(selectedExperiment.getData());
-        rawTable.setModel(model);
     }
 
     @Action
     public void addVariableToAnalysis() {
-        if (variablesComboBox.getSelectedItem() == null) {
-            System.out.println("selected item null");
-            return;
-        }
-        if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
-            System.out.println("variable box empty");
-            return;
-        }
-
-        String variableName = (String) variablesComboBox.getSelectedItem();
-        addVariableToAnalysis(selectedExperiment, variableName);
-    }
-
-    public void addVariableToAnalysis(DataTableExperiment experiment, String variableName) {
-        if (!analysisName.contains(experiment.getName())) {
-            analysisName = experiment.getName() + "_" + analysisName;
-        }
-        if (!analysisName.contains(variableName)) {
-            analysisName = analysisName + variableName;
-        }
-
-        DataTable analysisDataTable = ((IOBridgeTableModel) analysisTable.getModel()).getDataTable();
-
-        List<DescriptiveStatistics> statistics = experiment.getStatistics(variableName);
-
-        int iterationsToAdd = statistics.size();
-        if (!addAllRowsCheckBox.isSelected()) {
-            CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Number of rows:", "" + iterationsToAdd);
-            dialog.displayPrompt();
-            iterationsToAdd = Integer.parseInt(dialog.getInput());
-        }
-
-        if (analysisDataTable.getNumColums() == 0) {
-            List<Numeric> iterations = experiment.getIterationColumn();
-
-            int size = iterations.size();
-            for (int i = size - 1; i >= iterationsToAdd; i--) {
-                iterations.remove(i);
+        try {
+            if (variablesComboBox.getSelectedItem() == null) {
+                throw new CIDAException("Selected item is null");
             }
+            if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
+                throw new CIDAException("Variable box is empty");
+            }
+            String variableName = (String) variablesComboBox.getSelectedItem();
 
-            analysisDataTable.addColumn(iterations);
-            analysisDataTable.setColumnName(0, "Iterations");
+            int selectedIterations = 0;
+            if (!addAllRowsCheckBox.isSelected()) {
+                CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Number of rows:", "" + selectedIterations);
+                dialog.displayPrompt();
+                selectedIterations = Integer.parseInt(dialog.getInput());
+            }
+            experimentController.addVariableToAnalysisTable(variableName, selectedIterations);
+        } catch (CIDAException ex) {
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
+            return;
         }
-
-        int size = statistics.size();
-
-        List<Real> means = new ArrayList<Real>(size);
-        List<Real> stddevs = new ArrayList<Real>(size);
-
-        for (int i = 0; i < size; i++) {
-            means.add(new Real(statistics.get(i).getMean()));
-            stddevs.add(new Real(statistics.get(i).getStandardDeviation()));
-        }
-
-        analysisDataTable.addColumn(means);
-        analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, experiment.getName() + " " + variableName + " Mean");
-        analysisDataTable.addColumn(stddevs);
-        analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, experiment.getName() + " " + variableName + " Std Dev");
-
-        IOBridgeTableModel model = new IOBridgeTableModel();
-        model.setDataTable((StandardDataTable<Numeric>) analysisDataTable);
-        analysisTable.setModel(model);
-
-        addVariableToSynopsisTable(experiment, variableName);
     }
 
     @Action
@@ -309,31 +234,21 @@ public class CIDAView extends FrameView {
         }
 
         String variableName = (String) variablesComboBox.getSelectedItem();
-        addVariableToSynopsisTable(selectedExperiment, variableName);
-    }
-
-    public void addVariableToSynopsisTable(DataTableExperiment experiment, String variable) {
-        SynopsisTableModel model = (SynopsisTableModel) synopsisTable.getModel();
-
-        if (!model.getVariables().contains(variable)) {
-            model.getVariables().add(variable);
-        }
-
-        if (!model.getExperiments().contains(experiment)) {
-            model.getExperiments().add(experiment);
-        }
-
-        SynopsisTableModel newModel = new SynopsisTableModel(model);
-
-        synopsisTable.setModel(newModel);
+        experimentController.addVariableToSynopsisTable(variableName);
     }
 
     @Action
     public void addAllToAnalysis() {
-        int numVars = variablesComboBox.getItemCount();
-        for (int i = 0; i < numVars; i++) {
-            String variable = (String) variablesComboBox.getItemAt(i);
-            addVariableToAnalysis(selectedExperiment, variable);
+        try {
+            int numVars = variablesComboBox.getItemCount();
+            for (int i = 0; i < numVars; i++) {
+                String variable = (String) variablesComboBox.getItemAt(i);
+                experimentController.addVariableToAnalysisTable(variable, 0);
+            }
+        } catch (CIDAException ex) {
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
+            return;
         }
     }
 
@@ -342,44 +257,13 @@ public class CIDAView extends FrameView {
         int numVars = variablesComboBox.getItemCount();
         for (int i = 0; i < numVars; i++) {
             String variable = (String) variablesComboBox.getItemAt(i);
-            addVariableToSynopsisTable(selectedExperiment, variable);
+            experimentController.addVariableToSynopsisTable(variable);
         }
     }
 
     @Action
     public void addExperimentToTest() {
-        if (selectedExperiment == null) {
-            return;
-        }
-
-        addExperimentToTest(selectedExperiment);
-    }
-
-    public void addExperimentToTest(DataTableExperiment experiment) {
-        if (selectedExperiment == null) {
-            return;
-        }
-        if (!testExperiments.contains(selectedExperiment)) {
-            testExperiments.add(selectedExperiment);
-        }
-
-        Set<String> variableSet = Sets.newHashSet(testVariables);
-        Set<String> newVariables = Sets.newHashSet(selectedExperiment.getVariableNames());
-        variableSet = Sets.union(variableSet, newVariables);
-        testVariables.clear();
-        testVariables.addAll(variableSet);
-
-        variablesTestComboBox.removeAllItems();
-        for (String variable : testVariables) {
-            variablesTestComboBox.addItem(variable);
-        }
-
-        SynopsisTableModel model = (SynopsisTableModel) testExperimentsTable.getModel();
-        model.setExperiments(testExperiments);
-        model.setVariables(testVariables);
-
-        SynopsisTableModel newModel = new SynopsisTableModel(model);
-        testExperimentsTable.setModel(newModel);
+        experimentController.addExperimentToTest();
     }
 
     @Action
@@ -394,39 +278,23 @@ public class CIDAView extends FrameView {
 
     @Action
     public void exportRaw() {
-        JFileChooser chooser = new JFileChooser(startupDirectory);
-        chooser.setSelectedFile(new File(selectedExperiment.getName() + ".csv"));
-        int returnVal = chooser.showOpenDialog(this.getComponent());
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            try {
-                CSVFileWriter writer = new CSVFileWriter();
-                writer.setFile(chooser.getSelectedFile());
-                writer.open();
-                writer.write(((IOBridgeTableModel) rawTable.getModel()).getDataTable());
-                writer.close();
-            } catch (CIlibIOException ex) {
-                CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
-                dialog.displayPrompt();
-            }
+        try {
+            experimentController.exportRawTable();
+        } catch (CIlibIOException ex) {
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
+            return;
         }
     }
 
     @Action
     public void exportAnalysis() {
-        JFileChooser chooser = new JFileChooser(startupDirectory);
-        chooser.setSelectedFile(new File(analysisName + ".csv"));
-        int returnVal = chooser.showOpenDialog(this.getComponent());
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            try {
-                CSVFileWriter writer = new CSVFileWriter();
-                writer.setFile(chooser.getSelectedFile());
-                writer.open();
-                writer.write(((IOBridgeTableModel) analysisTable.getModel()).getDataTable());
-                writer.close();
-            } catch (CIlibIOException ex) {
-                CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
-                dialog.displayPrompt();
-            }
+        try {
+            experimentController.exportAnalysisTable();
+        } catch (CIlibIOException ex) {
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
+            return;
         }
     }
 
@@ -463,7 +331,7 @@ public class CIDAView extends FrameView {
             lineSeriesComboBox.addItem(new SeriesPair(i, (String) series.getKey()));
         }
 
-        JFreeChart chart = ChartFactory.createXYLineChart(analysisName, // Title
+        JFreeChart chart = ChartFactory.createXYLineChart(experimentController.getAnalysisName(), // Title
                 "Iterations", // X-Axis label
                 "Value", // Y-Axis label
                 xySeriesCollection, // Dataset
@@ -578,29 +446,79 @@ public class CIDAView extends FrameView {
 
     @Action
     public void runMannWhitneyUTest() {
-        if (testExperiments.size() > 2) {
-            CIDAPromptDialog dialog = new CIDAPromptDialog(this.getFrame(), "Mann Whitney U test is only applicable to 2 experiments.");
-            dialog.displayPrompt();
-            return;
-        }
-        MannWhitneyUTest test = new MannWhitneyUTest();
-        for (DataTableExperiment experiment : testExperiments) {
-            test.addExperiment(experiment);
-        }
-        
-        if (((String) hypothesisComboBox.getSelectedItem()).compareTo("Not Equal") == 0) {
-            test.setAlternativeHypothesisNotEquals();
-        } else if (((String) hypothesisComboBox.getSelectedItem()).compareTo("Less Than") == 0) {
-            test.setAlternativeHypothesisLessThan();
-        } else {
-            test.setAlternativeHypothesisGreaterThan();
-        }
+        experimentController.mannWhitneyUTest();
+    }
 
-        test.performTest((String) variablesTestComboBox.getSelectedItem());
-        DataTable table = test.getResults();
-        IOBridgeTableModel model = new IOBridgeTableModel();
-        model.setDataTable((StandardDataTable<Numeric>) table);
-        testResultsTable.setModel(model);
+    public JTable getAnalysisTable() {
+        return analysisTable;
+    }
+
+    public void setAnalysisTable(JTable analysisTable) {
+        this.analysisTable = analysisTable;
+    }
+
+    public JComboBox getExperimentsComboBox() {
+        return experimentsComboBox;
+    }
+
+    public void setExperimentsComboBox(JComboBox experimentsComboBox) {
+        this.experimentsComboBox = experimentsComboBox;
+    }
+
+    public JTable getRawTable() {
+        return rawTable;
+    }
+
+    public void setRawTable(JTable rawTable) {
+        this.rawTable = rawTable;
+    }
+
+    public JComboBox getVariablesComboBox() {
+        return variablesComboBox;
+    }
+
+    public void setVariablesComboBox(JComboBox variablesComboBox) {
+        this.variablesComboBox = variablesComboBox;
+    }
+
+    public JTable getSynopsisTable() {
+        return synopsisTable;
+    }
+
+    public void setSynopsisTable(JTable synopsisTable) {
+        this.synopsisTable = synopsisTable;
+    }
+
+    public JComboBox getVariablesTestComboBox() {
+        return variablesTestComboBox;
+    }
+
+    public void setVariablesTestComboBox(JComboBox variablesTestComboBox) {
+        this.variablesTestComboBox = variablesTestComboBox;
+    }
+
+    public JTable getTestExperimentsTable() {
+        return testExperimentsTable;
+    }
+
+    public void setTestExperimentsTable(JTable testExperimentsTable) {
+        this.testExperimentsTable = testExperimentsTable;
+    }
+
+    public JComboBox getHypothesisComboBox() {
+        return hypothesisComboBox;
+    }
+
+    public void setHypothesisComboBox(JComboBox hypothesisComboBox) {
+        this.hypothesisComboBox = hypothesisComboBox;
+    }
+
+    public JTable getTestResultsTable() {
+        return testResultsTable;
+    }
+
+    public void setTestResultsTable(JTable testResultsTable) {
+        this.testResultsTable = testResultsTable;
     }
 
     /** This method is called from within the constructor to

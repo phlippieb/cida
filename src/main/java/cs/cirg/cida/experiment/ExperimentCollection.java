@@ -19,11 +19,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida.experiment;
 
-import java.util.ArrayList;
-import java.util.List;
+import cs.cirg.cida.exception.CIDAException;
+import cs.cirg.cida.exception.ExperimentNotFoundException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,11 +34,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ExperimentCollection {
 
-    private List<DataTableExperiment> experiments;
+    private Map<Integer, IExperiment> experiments;
     private AtomicInteger idCounter;
 
     public ExperimentCollection() {
-        experiments = new ArrayList<DataTableExperiment>();
+        experiments = new HashMap<Integer, IExperiment>();
         idCounter = new AtomicInteger(0);
     }
 
@@ -49,32 +51,41 @@ public class ExperimentCollection {
         idCounter = new AtomicInteger(0);
     }
 
-    public List<DataTableExperiment> getExperiments() {
+    public Map<Integer, IExperiment> getExperiments() {
         return experiments;
     }
 
-    public void addExperiment(DataTableExperiment experiment) {
+    public void addExperiment(IExperiment experiment) {
         experiment.initialise();
-        experiments.add(experiment);
+        experiments.put(experiment.getId(), experiment);
     }
 
-    public boolean removeExperiment(DataTableExperiment experiment) {
-        return experiments.remove(experiment);
+    public IExperiment removeExperiment(IExperiment experiment) throws CIDAException {
+        IExperiment value = experiments.remove(experiment.getId());
+        if (value == null) {
+            throw new ExperimentNotFoundException("Unable to remove exception: " + experiment.getName());
+        }
+        return value;
     }
 
-    public DataTableExperiment getExperiment(String name) {
-        for (DataTableExperiment experiment : experiments) {
+    public boolean containsExperiment(IExperiment experiment) {
+        return experiments.containsKey(experiment.getId());
+    }
+
+    public IExperiment getExperiment(int id) throws CIDAException {
+        IExperiment value = experiments.get(id);
+        if (value == null) {
+            throw new ExperimentNotFoundException("Unable to find exception: " + id);
+        }
+        return value;
+    }
+
+    public IExperiment getExperiment(String name) throws ExperimentNotFoundException {
+        Collection<IExperiment> values = experiments.values();
+        for (IExperiment experiment : values) {
             if (experiment.getName().equals(name))
                 return experiment;
         }
-        return null;
-    }
-
-    public DataTableExperiment getExperiment(int id) {
-        for (DataTableExperiment experiment : experiments) {
-            if (experiment.getId() == id)
-                return experiment;
-        }
-        return null;
+        throw new ExperimentNotFoundException("Unable to find exception, id: " + name);
     }
 }

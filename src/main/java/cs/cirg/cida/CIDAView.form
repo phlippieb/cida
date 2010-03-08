@@ -171,7 +171,7 @@
                 <Component class="javax.swing.JButton" name="loadExperimentButton">
                   <Properties>
                     <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="loadExperiment" methodName="loadExperiment"/>
+                      <action/>
                     </Property>
                     <Property name="text" type="java.lang.String" resourceKey="loadExperimentButton.text"/>
                     <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -206,7 +206,7 @@
                 <Component class="javax.swing.JButton" name="addToTestButton">
                   <Properties>
                     <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addExperimentToTest" methodName="addExperimentToTest"/>
+                      <action/>
                     </Property>
                     <Property name="text" type="java.lang.String" resourceKey="addToTestButton.text"/>
                     <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -238,7 +238,7 @@
                 <Component class="javax.swing.JButton" name="addToAnalysisButton">
                   <Properties>
                     <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addVariableToAnalysis" methodName="addVariableToAnalysis"/>
+                      <action/>
                     </Property>
                     <Property name="text" type="java.lang.String" resourceKey="addToAnalysisButton.text"/>
                     <Property name="name" type="java.lang.String" value="addToAnalysisButton" noResource="true"/>
@@ -247,7 +247,7 @@
                 <Component class="javax.swing.JButton" name="addToSynopsisButton">
                   <Properties>
                     <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addVariableToSynopsisTable" methodName="addVariableToSynopsisTable"/>
+                      <action/>
                     </Property>
                     <Property name="text" type="java.lang.String" resourceKey="addToSynopsisButton.text"/>
                     <Property name="name" type="java.lang.String" value="addToSynopsisButton" noResource="true"/>
@@ -263,7 +263,7 @@
                 <Component class="javax.swing.JButton" name="addAllVariablesAnalysisButton">
                   <Properties>
                     <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addAllToAnalysis" methodName="addAllToAnalysis"/>
+                      <action/>
                     </Property>
                     <Property name="text" type="java.lang.String" resourceKey="addAllVariablesAnalysisButton.text"/>
                     <Property name="name" type="java.lang.String" value="addAllVariablesAnalysisButton" noResource="true"/>
@@ -319,7 +319,7 @@
                     <Component class="javax.swing.JButton" name="exportDataButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="exportRaw" methodName="exportRaw"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="exportDataButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -403,7 +403,7 @@
                     <Component class="javax.swing.JButton" name="plotButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="plotGraph" methodName="plotGraph"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="plotButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -415,7 +415,7 @@
                     <Component class="javax.swing.JButton" name="clearAnalysisButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="clearAnalysisTable" methodName="clearAnalysisTable"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="clearAnalysisButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -427,7 +427,7 @@
                     <Component class="javax.swing.JButton" name="exportAnalysisButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="exportAnalysis" methodName="exportAnalysis"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="exportAnalysisButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -513,7 +513,7 @@
                     <Component class="javax.swing.JToggleButton" name="toggleLineTicksButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="toggleLineTicks" methodName="toggleLineTicks"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="toggleLineTicksButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -551,7 +551,7 @@
                     <Component class="javax.swing.JButton" name="seriesColorButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="changeSeriesColor" methodName="changeSeriesColor"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="seriesColorButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -563,7 +563,7 @@
                     <Component class="javax.swing.JButton" name="seriesNameButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="changeSeriesName" methodName="changeSeriesName"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="seriesNameButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -575,7 +575,7 @@
                     <Component class="javax.swing.JButton" name="exportPNGButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="savePlotPNG" methodName="savePlotPNG"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="exportPNGButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -587,7 +587,7 @@
                     <Component class="javax.swing.JButton" name="exportEPSButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="savePlotEPS" methodName="savePlotEPS"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="exportEPSButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -702,7 +702,7 @@
                     <Component class="javax.swing.JButton" name="mannWhitneyUTestButton">
                       <Properties>
                         <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                          <action class="cs.cirg.cida.CIDAView" id="runMannWhitneyUTest" methodName="runMannWhitneyUTest"/>
+                          <action/>
                         </Property>
                         <Property name="text" type="java.lang.String" resourceKey="mannWhitneyUTestButton.text"/>
                         <Property name="focusable" type="boolean" value="false"/>
@@ -796,7 +796,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="exitMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="org.jdesktop.application.Application" id="quit" methodName="quit"/>
+                  <action/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="exitMenuItem" noResource="true"/>
               </Properties>
@@ -820,7 +820,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="aboutMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="cs.cirg.cida.DesktopApplication1View" id="showAboutBox" methodName="showAboutBox"/>
+                  <action/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="aboutMenuItem" noResource="true"/>
               </Properties>

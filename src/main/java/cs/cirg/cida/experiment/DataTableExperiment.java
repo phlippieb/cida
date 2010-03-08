@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Real;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -36,24 +37,29 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 public class DataTableExperiment implements IExperiment {
 
     private StandardDataTable<Numeric> data;
-    private HashMap<String, List<DescriptiveStatistics>> variableStatistics;
+    private HashMap<String, List<DescriptiveStatistics>> variableToStatsMap;
     private List<String> variableNames;
     private String experimentName;
     private String dataSource;
     private int id;
+    private boolean initisalised;
 
     public DataTableExperiment(int id, StandardDataTable<Numeric> dataTable) {
         data = dataTable;
-        variableStatistics = new HashMap<String, List<DescriptiveStatistics>>();
+        variableToStatsMap = new HashMap<String, List<DescriptiveStatistics>>();
         experimentName = "experiment";
         dataSource = "";
         this.id = id;
+        this.initisalised = false;
     }
 
     @Override
     public void initialise() {
-        this.determineVariableNames();
-        this.calculateStatistics();
+        if (!initisalised) {
+            this.determineVariableNames();
+            this.calculateStatistics();
+            initisalised = true;
+        }
     }
 
     public void determineVariableNames() {
@@ -87,7 +93,7 @@ public class DataTableExperiment implements IExperiment {
 
             DescriptiveStatsCalculator calculator = new DescriptiveStatsCalculator((StandardDataTable<Numeric>) data, selectedColumns);
             calculator.calculate();
-            variableStatistics.put(variableName, calculator.getIterationsDescriptiveStatistics());
+            variableToStatsMap.put(variableName, calculator.getIterationsDescriptiveStatistics());
         }
     }
 
@@ -170,7 +176,12 @@ public class DataTableExperiment implements IExperiment {
 
     @Override
     public List<DescriptiveStatistics> getStatistics(String variableName) {
-        return variableStatistics.get(variableName);
+        return variableToStatsMap.get(variableName);
+    }
+
+    @Override
+    public List<Real> getStatistic(String variableName, VariableStatistic statistic) {
+        return statistic.getStatistic(variableToStatsMap.get(variableName));
     }
 
     @Override
@@ -180,7 +191,7 @@ public class DataTableExperiment implements IExperiment {
 
     @Override
     public DescriptiveStatistics getBottomRowStatistics(String variableName) {
-        int size = variableStatistics.get(variableName).size();
-        return variableStatistics.get(variableName).get(size - 1);
+        int size = variableToStatsMap.get(variableName).size();
+        return variableToStatsMap.get(variableName).get(size - 1);
     }
 }

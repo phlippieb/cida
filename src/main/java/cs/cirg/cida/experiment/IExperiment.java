@@ -7,6 +7,7 @@ package cs.cirg.cida.experiment;
 import java.util.List;
 import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.type.types.Numeric;
+import net.sourceforge.cilib.type.types.Real;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -32,6 +33,8 @@ public interface IExperiment {
     List<Numeric> getIterationColumn();
 
     List<DescriptiveStatistics> getStatistics(String variableName);
+
+    List<Real> getStatistic(String variableName, VariableStatistic statistic);
 
     void initialise();
 

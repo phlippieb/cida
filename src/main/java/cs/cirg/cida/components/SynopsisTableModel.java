@@ -23,6 +23,7 @@
 package cs.cirg.cida.components;
 
 import cs.cirg.cida.experiment.DataTableExperiment;
+import cs.cirg.cida.experiment.IExperiment;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -34,11 +35,11 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
  */
 public class SynopsisTableModel extends AbstractTableModel {
 
-    List<DataTableExperiment> experiments;
+    List<IExperiment> experiments;
     List<String> variables;
 
     public SynopsisTableModel() {
-        experiments = new ArrayList<DataTableExperiment>();
+        experiments = new ArrayList<IExperiment>();
         variables = new ArrayList<String>();
     }
 
@@ -72,18 +73,18 @@ public class SynopsisTableModel extends AbstractTableModel {
             return experiments.get(rowIndex).getName();
         }
         if (columnIndex % 2 != 0) {
-            DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getFinalIterationStatistics(variables.get(columnIndex / 2));
+            DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getBottomRowStatistics(variables.get(columnIndex / 2));
             return descriptiveStatistics.getMean();
         }
-        DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getFinalIterationStatistics(variables.get(columnIndex / 2 - 1));
+        DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getBottomRowStatistics(variables.get(columnIndex / 2 - 1));
         return descriptiveStatistics.getStandardDeviation();
     }
 
-    public List<DataTableExperiment> getExperiments() {
+    public List<IExperiment> getExperiments() {
         return experiments;
     }
 
-    public void setExperiments(List<DataTableExperiment> experiments) {
+    public void setExperiments(List<IExperiment> experiments) {
         this.experiments = experiments;
     }
 

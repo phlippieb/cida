@@ -20,44 +20,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package cs.cirg.cida.analysis;
-
-import cs.cirg.cida.experiment.IExperiment;
-import java.util.ArrayList;
-import net.sourceforge.cilib.io.DataTable;
+package cs.cirg.cida.exception;
 
 /**
  *
  * @author andrich
  */
-public abstract class StatisticalTest {
+public class CIDAException extends Exception {
 
-    protected ArrayList<IExperiment> experiments;
-    protected DataTable results;
-
-    public StatisticalTest() {
-        experiments = new ArrayList<IExperiment>();
+    public CIDAException() {
+        super();
     }
 
-    public void addExperiment(IExperiment experiment) {
-        experiments.add(experiment);
+    public CIDAException(String message) {
+        super(message);
     }
 
-    public abstract DataTable performTest(String... variableNames);
-
-    public ArrayList<IExperiment> getExperiments() {
-        return experiments;
-    }
-
-    public void setExperiments(ArrayList<IExperiment> experiments) {
-        this.experiments = experiments;
-    }
-
-    public DataTable getResults() {
-        return results;
-    }
-
-    public void setResults(DataTable results) {
-        this.results = results;
-    }
 }

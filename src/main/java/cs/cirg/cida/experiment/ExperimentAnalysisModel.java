@@ -21,6 +21,13 @@
  */
 package cs.cirg.cida.experiment;
 
+import cs.cirg.cida.components.CIlibOutputReader;
+import java.io.File;
+import net.sourceforge.cilib.io.DataTableBuilder;
+import net.sourceforge.cilib.io.StandardDataTable;
+import net.sourceforge.cilib.io.exception.CIlibIOException;
+import net.sourceforge.cilib.type.types.Numeric;
+
 /**
  *
  * @author andrich
@@ -28,19 +35,36 @@ package cs.cirg.cida.experiment;
 public class ExperimentAnalysisModel {
 
     private ExperimentCollection experimentCollection;
-    private DataTableExperiment selectedExperiment;
+    private IExperiment activeExperiment;
     private String analysisName;
-    private String analysisDirectory;
+    private String dataDirectory;
 
-    public ExperimentAnalysisModel() {
+    public ExperimentAnalysisModel(String dataDirectory) {
         experimentCollection = new ExperimentCollection();
-        reset();
+        reset(dataDirectory);
     }
 
-    public void reset() {
+    public void reset(String dataDirectory) {
         experimentCollection.clear();
         this.setAnalysisName("");
-        this.setAnalysisDirectory("");
+        this.setDataDirectory(dataDirectory);
+    }
+
+    public void addExperiment(File dataFile, String experimentName) throws CIlibIOException {
+        CIlibOutputReader reader = new CIlibOutputReader();
+        reader.setSourceURL(dataFile.getAbsolutePath());
+        DataTableBuilder dataTableBuilder = new DataTableBuilder(reader);
+        try {
+            dataTableBuilder.buildDataTable();
+        } catch (NumberFormatException ex) {
+            throw new CIlibIOException(ex);
+        }
+
+        IExperiment experiment = new DataTableExperiment(experimentCollection.nextExperimentID(),
+                (StandardDataTable<Numeric>) dataTableBuilder.getDataTable());
+        experiment.setDataSource(dataFile.getAbsolutePath());
+        experiment.setName(experimentName);
+        experimentCollection.addExperiment(experiment);
     }
 
     public ExperimentCollection getExperimentCollection() {
@@ -51,6 +75,15 @@ public class ExperimentAnalysisModel {
         this.experimentCollection = experimentCollection;
     }
 
+    public void updateAnalysisName(IExperiment experiment, String variableName) {
+        if (!analysisName.contains(experiment.getName())) {
+            analysisName = experiment.getName() + "_" + analysisName;
+        }
+        if (!analysisName.contains(variableName)) {
+            analysisName = analysisName + variableName;
+        }
+    }
+
     public String getAnalysisName() {
         return analysisName;
     }
@@ -59,14 +92,22 @@ public class ExperimentAnalysisModel {
         this.analysisName = analysisName;
     }
 
-    public String getAnalysisDirectory() {
-        return analysisDirectory;
+    public String getDataDirectory() {
+        return dataDirectory;
     }
 
-    public void setAnalysisDirectory(String analysisDirectory) {
-        this.analysisDirectory = analysisDirectory;
-        if (this.analysisDirectory.charAt(this.analysisDirectory.length() - 1) != '/') {
-            this.analysisDirectory += '/';
+    public void setDataDirectory(String dataDirectory) {
+        this.dataDirectory = dataDirectory;
+        if (this.dataDirectory.charAt(this.dataDirectory.length() - 1) != '/') {
+            this.dataDirectory += '/';
         }
+    }
+
+    public IExperiment getActiveExperiment() {
+        return activeExperiment;
+    }
+
+    public void setActiveExperiment(IExperiment activeExperiment) {
+        this.activeExperiment = activeExperiment;
     }
 }
