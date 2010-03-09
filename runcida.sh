@@ -21,7 +21,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-CIDA_VERSION=0.1.1
+CIDA_VERSION=0.2.1
 
 if [ -f target/cida-$CIDA_VERSION.jar ]; then
     nice java -server -Xms1000M -Xmx2000M -jar target/cida-$CIDA_VERSION.jar $@
