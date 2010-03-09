@@ -666,6 +666,7 @@ public class CIDAView extends FrameView {
         addAllVariablesAnalysisButton.setText(resourceMap.getString("addAllVariablesAnalysisButton.text")); // NOI18N
         addAllVariablesAnalysisButton.setName("addAllVariablesAnalysisButton"); // NOI18N
 
+        addAllVariablesSynopsisButton.setAction(actionMap.get("addAllToSynopsis")); // NOI18N
         addAllVariablesSynopsisButton.setText(resourceMap.getString("addAllVariablesSynopsisButton.text")); // NOI18N
         addAllVariablesSynopsisButton.setName("addAllVariablesSynopsisButton"); // NOI18N
 
@@ -1019,7 +1020,6 @@ public class CIDAView extends FrameView {
         fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
 
-        exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setName("exitMenuItem"); // NOI18N
         fileMenu.add(exitMenuItem);
 
@@ -1028,7 +1028,6 @@ public class CIDAView extends FrameView {
         helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
         helpMenu.setName("helpMenu"); // NOI18N
 
-        aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
         aboutMenuItem.setName("aboutMenuItem"); // NOI18N
         helpMenu.add(aboutMenuItem);
 

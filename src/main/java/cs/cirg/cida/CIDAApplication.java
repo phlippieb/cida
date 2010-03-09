@@ -62,7 +62,8 @@ public class CIDAApplication extends SingleFrameApplication {
             startupDirectory = args[0];
             File file = new File(startupDirectory);
             if (!(file.exists() && file.isDirectory())) {
-                System.out.println("Usage: CIDA [directory]");
+                System.out.println("'"+startupDirectory+"' does not exist or is not a directory.");
+                System.out.println("Usage: cida [directory]");
                 System.out.println("where diretory is:");
                 System.out.println("A valid system directory that CIDA will use as the default directory to load data files from;");
                 System.out.println("if no directory is specified, then the user's home directory is used.");
