@@ -65,10 +65,16 @@ public class ExperimentController {
         model.setActiveExperiment(model.getExperimentCollection().getExperiment(experimentName));
         List<String> variableNames = model.getActiveExperiment().getVariableNames();
 
+        String currentVariableSelection = (String)view.getVariablesComboBox().getSelectedItem();
         view.getVariablesComboBox().removeAllItems();
+        boolean currentSelectionAvailable = false;
         for (String variableName : variableNames) {
+            if ((currentVariableSelection != null) && (variableName.compareTo(currentVariableSelection) == 0))
+                currentSelectionAvailable = true;
             view.getVariablesComboBox().addItem(variableName);
         }
+        if (currentSelectionAvailable)
+            view.getVariablesComboBox().setSelectedItem(currentVariableSelection);
 
         IOBridgeTableModel ioTableModel = new IOBridgeTableModel();
         ioTableModel.setDataTable(model.getActiveExperiment().getData());
