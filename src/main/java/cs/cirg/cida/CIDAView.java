@@ -33,8 +33,6 @@ import cs.cirg.cida.experiment.ExperimentController;
 import java.awt.Color;
 import java.awt.Paint;
 import javax.swing.JTable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -315,14 +313,15 @@ public class CIDAView extends FrameView {
             writer.write("\\begin{center}\n");
             writer.write("\\begin{tabular}{");
             int numCols = synopsisTable.getColumnCount();
-            for (int i = 0; i < numCols; i++) {
-                writer.write(" | c");
+            writer.write(" | l");
+            for (int i = 0; i < (numCols-1)/2; i++) {
+                writer.write(" | p{1.2cm}");
             }
-            writer.write(" |");
-            writer.write("}\n");
+            writer.write(" |}\n");
             writer.write("\\hline\\hline\n");
-            writer.write("{\\bf " + synopsisTable.getModel().getColumnName(0) + "}");
-            for (int i = 1; i < numCols; i++) {
+            //writer.write("{\\bf " + synopsisTable.getModel().getColumnName(0) + "}");
+            writer.write("{\\bf Problem}");
+            for (int i = 1; i < numCols; i+=2) {
                 writer.write(" & {\\bf " + synopsisTable.getModel().getColumnName(i) + "}");
             }
             writer.write("\\\\\n");
@@ -334,18 +333,26 @@ public class CIDAView extends FrameView {
                 if (value instanceof Number) {
                     value = formatter.format(value);
                 }
-                writer.write(value.toString());
-                for (int j = 1; j < numCols; j++) {
+                writer.write(value.toString()+"\t");
+                for (int j = 1; j < numCols; j+=2) {
+                    //means
                     value = synopsisTable.getModel().getValueAt(i, j);
                     if (value instanceof Number) {
                         value = formatter.format(value);
                     }
-                    writer.write(" & " + value.toString());
+                    writer.write("\t&\t" + value.toString());
+
+                    //stddevs
+                    value = synopsisTable.getModel().getValueAt(i, j+1);
+                    if (value instanceof Number) {
+                        value = formatter.format(value);
+                    }
+                    writer.write(" (" + value.toString() + ")");
                 }
                 writer.write("\\\\\n");
                 writer.write("\\hline\n");
             }
-            writer.write("\\hline\\hline\n");
+            writer.write("\\hline\n");
             writer.write("\\end{tabular}\n");
             writer.write("\\end{center}\n");
             writer.write("\\end{table}\n");
