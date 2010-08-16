@@ -58,6 +58,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.io.exception.CIlibIOException;
@@ -302,71 +303,13 @@ public class CIDAView extends FrameView {
     }
 
     @Action
-    public void exportTable() {
-        DecimalFormat formatter = new DecimalFormat("#.#####");
-        BufferedWriter writer = null;
-        try {
-            File file = new File("table.tex");
-            writer = new BufferedWriter(new FileWriter(file));
-
-            writer.write("\\begin{table}[htb]\n");
-            writer.write("\\begin{center}\n");
-            writer.write("\\begin{tabular}{");
-            int numCols = synopsisTable.getColumnCount();
-            writer.write(" | l");
-            for (int i = 0; i < (numCols-1)/2; i++) {
-                writer.write(" | p{1.2cm}");
-            }
-            writer.write(" |}\n");
-            writer.write("\\hline\\hline\n");
-            //writer.write("{\\bf " + synopsisTable.getModel().getColumnName(0) + "}");
-            writer.write("{\\bf Problem}");
-            for (int i = 1; i < numCols; i+=2) {
-                writer.write(" & {\\bf " + synopsisTable.getModel().getColumnName(i) + "}");
-            }
-            writer.write("\\\\\n");
-            writer.write("\\hline\n");
-
-            int numRows = synopsisTable.getRowCount();
-            for (int i = 0; i < numRows; i++) {
-                Object value = synopsisTable.getModel().getValueAt(i, 0);
-                if (value instanceof Number) {
-                    value = formatter.format(value);
-                }
-                writer.write(value.toString()+"\t");
-                for (int j = 1; j < numCols; j+=2) {
-                    //means
-                    value = synopsisTable.getModel().getValueAt(i, j);
-                    if (value instanceof Number) {
-                        value = formatter.format(value);
-                    }
-                    writer.write("\t&\t" + value.toString());
-
-                    //stddevs
-                    value = synopsisTable.getModel().getValueAt(i, j+1);
-                    if (value instanceof Number) {
-                        value = formatter.format(value);
-                    }
-                    writer.write(" (" + value.toString() + ")");
-                }
-                writer.write("\\\\\n");
-                writer.write("\\hline\n");
-            }
-            writer.write("\\hline\n");
-            writer.write("\\end{tabular}\n");
-            writer.write("\\end{center}\n");
-            writer.write("\\end{table}\n");
-            writer.flush();
-            writer.close();
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+    public void exportSynopsisTable() {
+        JFileChooser chooser = new JFileChooser(experimentController.getDataDirectory());
+        //model.getActiveExperiment().getName() + ".csv"
+        chooser.setSelectedFile(new File("table.tex"));
+        int returnVal = chooser.showOpenDialog(this.getComponent());
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            experimentController.exportSynopsisTable(chooser.getSelectedFile());
         }
     }
 
@@ -743,7 +686,7 @@ public class CIDAView extends FrameView {
         addAllVariablesSynopsisButton.setText(resourceMap.getString("addAllVariablesSynopsisButton.text")); // NOI18N
         addAllVariablesSynopsisButton.setName("addAllVariablesSynopsisButton"); // NOI18N
 
-        exportTableButton.setAction(actionMap.get("exportTable")); // NOI18N
+        exportTableButton.setAction(actionMap.get("exportSynopsisTable")); // NOI18N
         exportTableButton.setText(resourceMap.getString("exportTableButton.text")); // NOI18N
         exportTableButton.setName("exportTableButton"); // NOI18N
 
@@ -815,7 +758,7 @@ public class CIDAView extends FrameView {
                 .add(10, 10, 10)
                 .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -856,7 +799,7 @@ public class CIDAView extends FrameView {
             .add(rawPanelLayout.createSequentialGroup()
                 .add(rawPanelToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 886, Short.MAX_VALUE)
+                .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 882, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -919,7 +862,7 @@ public class CIDAView extends FrameView {
             .add(analysisPanelLayout.createSequentialGroup()
                 .add(analysisToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 886, Short.MAX_VALUE)
+                .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 882, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1013,7 +956,7 @@ public class CIDAView extends FrameView {
             .add(chartHomePanelLayout.createSequentialGroup()
                 .add(chartToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 898, Short.MAX_VALUE))
+                .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 894, Short.MAX_VALUE))
         );
 
         testPanel.addTab(resourceMap.getString("chartHomePanel.TabConstraints.tabTitle"), chartHomePanel); // NOI18N
@@ -1077,9 +1020,9 @@ public class CIDAView extends FrameView {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(testToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE)
                 .add(128, 128, 128)
-                .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
+                .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 383, Short.MAX_VALUE))
         );
 
         testPanel.addTab(resourceMap.getString("jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
@@ -1092,7 +1035,7 @@ public class CIDAView extends FrameView {
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE)
+            .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 968, Short.MAX_VALUE)
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -1132,7 +1075,7 @@ public class CIDAView extends FrameView {
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 878, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 876, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)

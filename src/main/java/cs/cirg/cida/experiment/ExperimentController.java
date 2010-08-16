@@ -25,7 +25,11 @@ import cs.cirg.cida.CIDAView;
 import cs.cirg.cida.components.IOBridgeTableModel;
 import cs.cirg.cida.components.SynopsisTableModel;
 import cs.cirg.cida.exception.CIDAException;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
@@ -65,16 +69,18 @@ public class ExperimentController {
         model.setActiveExperiment(model.getExperimentCollection().getExperiment(experimentName));
         List<String> variableNames = model.getActiveExperiment().getVariableNames();
 
-        String currentVariableSelection = (String)view.getVariablesComboBox().getSelectedItem();
+        String currentVariableSelection = (String) view.getVariablesComboBox().getSelectedItem();
         view.getVariablesComboBox().removeAllItems();
         boolean currentSelectionAvailable = false;
         for (String variableName : variableNames) {
-            if ((currentVariableSelection != null) && (variableName.compareTo(currentVariableSelection) == 0))
+            if ((currentVariableSelection != null) && (variableName.compareTo(currentVariableSelection) == 0)) {
                 currentSelectionAvailable = true;
+            }
             view.getVariablesComboBox().addItem(variableName);
         }
-        if (currentSelectionAvailable)
+        if (currentSelectionAvailable) {
             view.getVariablesComboBox().setSelectedItem(currentVariableSelection);
+        }
 
         IOBridgeTableModel ioTableModel = new IOBridgeTableModel();
         ioTableModel.setDataTable(model.getActiveExperiment().getData());
@@ -147,6 +153,73 @@ public class ExperimentController {
         synopsisTable.setModel(newModel);
     }
 
+    public void exportSynopsisTable(File file) {
+        BufferedWriter writer = null;
+        DecimalFormat formatter = new DecimalFormat("#.#####");
+        try {
+            JTable synopsisTable = view.getSynopsisTable();
+            writer = new BufferedWriter(new FileWriter(file));
+
+            writer.write("\\begin{table}[htb]\n");
+            writer.write("\\begin{center}\n");
+            writer.write("\\begin{tabular}{");
+            int numCols = synopsisTable.getColumnCount();
+            writer.write(" | l");
+            for (int i = 0; i < (numCols - 1) / 2; i++) {
+                writer.write(" | p{1.2cm}");
+            }
+            writer.write(" |}\n");
+            writer.write("\\hline\\hline\n");
+            //writer.write("{\\bf " + synopsisTable.getModel().getColumnName(0) + "}");
+            writer.write("{\\bf Problem}");
+            for (int i = 1; i < numCols; i += 2) {
+                writer.write(" & {\\bf " + synopsisTable.getModel().getColumnName(i) + "}");
+            }
+            writer.write("\\\\\n");
+            writer.write("\\hline\n");
+
+            int numRows = synopsisTable.getRowCount();
+            for (int i = 0; i < numRows; i++) {
+                Object value = synopsisTable.getModel().getValueAt(i, 0);
+                if (value instanceof Number) {
+                    value = formatter.format(value);
+                }
+                writer.write(value.toString() + "\t");
+                for (int j = 1; j < numCols; j += 2) {
+                    //means
+                    value = synopsisTable.getModel().getValueAt(i, j);
+                    if (value instanceof Number) {
+                        value = formatter.format(value);
+                    }
+                    writer.write("\t&\t" + value.toString());
+
+                    //stddevs
+                    value = synopsisTable.getModel().getValueAt(i, j + 1);
+                    if (value instanceof Number) {
+                        value = formatter.format(value);
+                    }
+                    writer.write(" (" + value.toString() + ")");
+                }
+                writer.write("\\\\\n");
+                writer.write("\\hline\n");
+            }
+            writer.write("\\hline\n");
+            writer.write("\\end{tabular}\n");
+            writer.write("\\end{center}\n");
+            writer.write("\\end{table}\n");
+            writer.flush();
+            writer.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                writer.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     public void addExperimentToTest() {
         experimentTestController.addExperiment(model.getActiveExperiment());
     }
@@ -156,7 +229,7 @@ public class ExperimentController {
     }
 
     public void exportAnalysisTable() throws CIlibIOException {
-        exportTable(view.getAnalysisTable(), model.getAnalysisName()+".csv");
+        exportTable(view.getAnalysisTable(), model.getAnalysisName() + ".csv");
     }
 
     public void exportTable(JTable table, String filename) throws CIlibIOException {

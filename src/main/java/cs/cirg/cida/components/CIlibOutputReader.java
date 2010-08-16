@@ -19,7 +19,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida.components;
 
 import java.util.ArrayList;
@@ -41,9 +40,10 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
         columnNames = new ArrayList<String>();
         this.processHeader();
     }
-    
+
     @Override
     public List<Type> nextRow() {
+
         String line = null;
         if (firstDataLine != null) {
             line = firstDataLine;
@@ -52,13 +52,19 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
             line = this.nextLine();
         }
         String[] types = line.split("\\s");
-        ArrayList<Type> row = new ArrayList<Type>(types.length+1);
+        ArrayList<Type> row = new ArrayList<Type>(types.length + 1);
         row.add(new Int(Integer.parseInt(types[0])));
         for (int i = 1; i < types.length; i++) {
-            if (!types[i].isEmpty())
-                row.add(new Real(Double.parseDouble(types[i])));
+            if (!types[i].isEmpty()) {
+                try {
+                    row.add(new Real(Double.parseDouble(types[i])));
+                } catch (NumberFormatException ex) {
+                    row.add(row.get(i-1));
+                }
+            }
         }
         return row;
+
     }
 
     public List<String> getColumnNames() {
@@ -67,16 +73,18 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
 
     private void processHeader() throws CIlibIOException {
         String line = this.nextLine();
-        while (line.charAt(0)=='#') {
+        while (line.charAt(0) == '#') {
             int seperatorIndex = line.indexOf('-');
-            int column = Integer.parseInt(line.substring(1,seperatorIndex - 1).trim());
+            int column = Integer.parseInt(line.substring(1, seperatorIndex - 1).trim());
             String columnName = line.substring(seperatorIndex + 2);
             columnNames.add(columnName);
             line = this.nextLine();
             if (line == null) // this shouldn't happen, the next line after
+            {
                 throw new CIlibIOException("Unexpected end of file: " + // the header should contain data
-                        this.getFile().getName() +
-                        ", data expected after header.");
+                        this.getFile().getName()
+                        + ", data expected after header.");
+            }
         }
         firstDataLine = line;
     }
