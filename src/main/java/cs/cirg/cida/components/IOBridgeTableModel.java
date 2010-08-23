@@ -34,10 +34,16 @@ public class IOBridgeTableModel extends AbstractTableModel {
         dataTable = new StandardDataTable<Type>();
     }
 
+    public IOBridgeTableModel(StandardDataTable<? extends Type> table) {
+        dataTable = table;
+    }
+
+    @Override
     public int getRowCount() {
         return dataTable.getNumRows();
     }
 
+    @Override
     public int getColumnCount() {
         return dataTable.getNumColums();
     }
@@ -47,8 +53,12 @@ public class IOBridgeTableModel extends AbstractTableModel {
         return dataTable.getColumnName(column);
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return dataTable.getRow(rowIndex).get(columnIndex);
+        if (rowIndex < dataTable.getNumRows() && columnIndex < dataTable.getNumColums())
+            return dataTable.getRow(rowIndex).get(columnIndex);
+        else
+            return null;
     }
 
     @Override

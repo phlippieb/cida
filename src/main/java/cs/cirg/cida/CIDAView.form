@@ -6,32 +6,43 @@
       <Properties>
         <Property name="name" type="java.lang.String" value="mainPanel" noResource="true"/>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-          <Dimension value="[1280, 1024]"/>
+          <Dimension value="[1024, 768]"/>
         </Property>
       </Properties>
 
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="testPanel" alignment="0" pref="1060" max="32767" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="testPanel" pref="1012" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="testPanel" alignment="0" pref="968" max="32767" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="testPanel" pref="756" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
         <Container class="javax.swing.JTabbedPane" name="testPanel">
           <Properties>
+            <Property name="autoscrolls" type="boolean" value="true"/>
             <Property name="name" type="java.lang.String" value="testPanel" noResource="true"/>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[1024, 768]"/>
+            </Property>
           </Properties>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
           <SubComponents>
             <Container class="javax.swing.JPanel" name="homePanel">
               <Properties>
+                <Property name="autoscrolls" type="boolean" value="true"/>
                 <Property name="name" type="java.lang.String" value="homePanel" noResource="true"/>
               </Properties>
               <Constraints>
@@ -45,40 +56,44 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jSeparator1" alignment="0" pref="1036" max="32767" attributes="0"/>
-                              <Component id="jSeparator2" alignment="1" pref="1036" max="32767" attributes="0"/>
-                              <Component id="jScrollPane1" alignment="0" pref="1036" max="32767" attributes="0"/>
+                              <Component id="jScrollPane1" alignment="0" pref="976" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="variablesLabel" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="variablesComboBox" min="-2" pref="350" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                      <Group type="102" alignment="1" attributes="1">
+                                          <Component id="variablesLabel" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="32767" attributes="0"/>
+                                          <Component id="variablesComboBox" min="-2" pref="341" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="experimentsComboBox" min="-2" pref="348" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                              <Group type="102" attributes="0">
+                                                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                                                  <Component id="addToTestButton" min="-2" max="-2" attributes="1"/>
+                                              </Group>
+                                              <Group type="102" attributes="1">
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="loadExperimentButton" max="32767" attributes="1"/>
+                                              </Group>
+                                          </Group>
+                                      </Group>
+                                  </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="addToSynopsisButton" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="addAllVariablesAnalysisButton" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="addAllVariablesSynopsisButton" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="addToAnalysisButton" alignment="1" max="32767" attributes="1"/>
-                                      <Component id="exportTableButton" alignment="0" max="32767" attributes="1"/>
+                                      <Component id="editResultsNameCheckBox" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="addToAnalysisPanel" alignment="0" max="32767" attributes="1"/>
+                                      <Component id="exportTableButton" alignment="0" min="-2" max="-2" attributes="1"/>
+                                      <Component id="addToAnalysisPanel2" alignment="0" max="32767" attributes="1"/>
+                                      <Component id="addToAnalysisPanel1" alignment="0" min="-2" max="-2" attributes="1"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="addAllRowsCheckBox" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="experimentsLabel" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="62" max="-2" attributes="0"/>
-                                  <Component id="experimentsComboBox" min="-2" pref="348" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                      <Component id="addToTestButton" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="loadExperimentButton" alignment="0" pref="129" max="32767" attributes="1"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="editResultsNameCheckBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace pref="184" max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="experimentsLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -86,57 +101,48 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="experimentsLabel" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="loadExperimentButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="editResultsNameCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="experimentsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="experimentsLabel" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="editResultsNameCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="experimentsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="loadExperimentButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="addToTestButton" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="variablesComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="variablesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="addToAnalysisPanel" min="-2" max="-2" attributes="1"/>
+                                  <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="addAllRowsCheckBox" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="addToTestButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
-                          <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="variablesLabel" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-                                  <Component id="variablesComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="addToAnalysisButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="addAllRowsCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
+                          <Component id="addToAnalysisPanel1" min="-2" max="-2" attributes="1"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="addToSynopsisButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="addAllVariablesAnalysisButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="addAllVariablesSynopsisButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="addToAnalysisPanel2" min="-2" max="-2" attributes="1"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="exportTableButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                          <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="457" max="32767" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="jScrollPane1" pref="306" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JSeparator" name="jSeparator1">
-                  <Properties>
-                    <Property name="name" type="java.lang.String" value="jSeparator1" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JSeparator" name="jSeparator2">
-                  <Properties>
-                    <Property name="name" type="java.lang.String" value="jSeparator2" noResource="true"/>
-                  </Properties>
-                </Component>
                 <Container class="javax.swing.JScrollPane" name="jScrollPane1">
                   <Properties>
                     <Property name="name" type="java.lang.String" value="jScrollPane1" noResource="true"/>
@@ -238,47 +244,11 @@
                     <Property name="name" type="java.lang.String" value="variablesComboBox" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="addToAnalysisButton">
-                  <Properties>
-                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addVariableToAnalysis" methodName="addVariableToAnalysis"/>
-                    </Property>
-                    <Property name="text" type="java.lang.String" resourceKey="addToAnalysisButton.text"/>
-                    <Property name="name" type="java.lang.String" value="addToAnalysisButton" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="addToSynopsisButton">
-                  <Properties>
-                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addVariableToSynopsisTable" methodName="addVariableToSynopsisTable"/>
-                    </Property>
-                    <Property name="text" type="java.lang.String" resourceKey="addToSynopsisButton.text"/>
-                    <Property name="name" type="java.lang.String" value="addToSynopsisButton" noResource="true"/>
-                  </Properties>
-                </Component>
                 <Component class="javax.swing.JCheckBox" name="addAllRowsCheckBox">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
                     <Property name="text" type="java.lang.String" resourceKey="addAllRowsCheckBox.text"/>
                     <Property name="name" type="java.lang.String" value="addAllRowsCheckBox" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="addAllVariablesAnalysisButton">
-                  <Properties>
-                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addAllToAnalysis" methodName="addAllToAnalysis"/>
-                    </Property>
-                    <Property name="text" type="java.lang.String" resourceKey="addAllVariablesAnalysisButton.text"/>
-                    <Property name="name" type="java.lang.String" value="addAllVariablesAnalysisButton" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="addAllVariablesSynopsisButton">
-                  <Properties>
-                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                      <action class="cs.cirg.cida.CIDAView" id="addAllToSynopsis" methodName="addAllToSynopsis"/>
-                    </Property>
-                    <Property name="text" type="java.lang.String" resourceKey="addAllVariablesSynopsisButton.text"/>
-                    <Property name="name" type="java.lang.String" value="addAllVariablesSynopsisButton" noResource="true"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="exportTableButton">
@@ -290,6 +260,161 @@
                     <Property name="name" type="java.lang.String" value="exportTableButton" noResource="true"/>
                   </Properties>
                 </Component>
+                <Container class="javax.swing.JPanel" name="addToAnalysisPanel">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="addToAnalysisPanel" noResource="true"/>
+                  </Properties>
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="addOneVariableAnalysis" max="32767" attributes="1"/>
+                                  <Component id="jLabel5" alignment="0" max="32767" attributes="1"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="addAllExperimentsAnalysis" pref="113" max="32767" attributes="1"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="addOneVariableAnalysis" alignment="3" max="32767" attributes="1"/>
+                                  <Component id="addAllExperimentsAnalysis" alignment="3" max="32767" attributes="1"/>
+                              </Group>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JButton" name="addOneVariableAnalysis">
+                      <Properties>
+                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                          <action class="cs.cirg.cida.CIDAView" id="addVariableAnalysis" methodName="addVariableAnalysis"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" resourceKey="addOneVariableAnalysis.text"/>
+                        <Property name="name" type="java.lang.String" value="addOneVariableAnalysis" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JButton" name="addAllExperimentsAnalysis">
+                      <Properties>
+                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                          <action class="cs.cirg.cida.CIDAView" id="addAllExperimentsAnalysis" methodName="addAllExperimentsAnalysis"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" resourceKey="addAllExperimentsAnalysis.text"/>
+                        <Property name="name" type="java.lang.String" value="addAllExperimentsAnalysis" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel5">
+                      <Properties>
+                        <Property name="font" type="java.awt.Font" resourceKey="jLabel5.font"/>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel5.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel5" noResource="true"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Container class="javax.swing.JPanel" name="addToAnalysisPanel1">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="addToAnalysisPanel1" noResource="true"/>
+                  </Properties>
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="jLabel4" min="-2" max="-2" attributes="1"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="addAllVariablesAnalysis" alignment="0" pref="205" max="32767" attributes="1"/>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="addAllVariablesAnalysis" max="32767" attributes="1"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JButton" name="addAllVariablesAnalysis">
+                      <Properties>
+                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                          <action class="cs.cirg.cida.CIDAView" id="addAllVariablesAnalysis" methodName="addAllVariablesAnalysis"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" resourceKey="addAllVariablesAnalysis.text"/>
+                        <Property name="name" type="java.lang.String" value="addAllVariablesAnalysis" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel4">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+                <Component class="javax.swing.JLabel" name="jLabel3">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" resourceKey="jLabel3.font"/>
+                    <Property name="text" type="java.lang.String" resourceKey="jLabel3.text"/>
+                    <Property name="name" type="java.lang.String" value="jLabel3" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Container class="javax.swing.JPanel" name="addToAnalysisPanel2">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="addToAnalysisPanel2" noResource="true"/>
+                  </Properties>
+
+                  <Layout>
+                    <DimensionLayout dim="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                                  <Component id="addAllAnalysis" alignment="0" min="-2" max="-2" attributes="1"/>
+                              </Group>
+                              <EmptySpace pref="95" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                    <DimensionLayout dim="1">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="addAllAnalysis" max="32767" attributes="1"/>
+                          </Group>
+                      </Group>
+                    </DimensionLayout>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="javax.swing.JButton" name="addAllAnalysis">
+                      <Properties>
+                        <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                          <action class="cs.cirg.cida.CIDAView" id="addAllAnalysis" methodName="addAllAnalysis"/>
+                        </Property>
+                        <Property name="text" type="java.lang.String" resourceKey="addAllAnalysis.text"/>
+                        <Property name="name" type="java.lang.String" value="addAllAnalysis" noResource="true"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel6">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" resourceKey="jLabel6.text"/>
+                        <Property name="name" type="java.lang.String" value="jLabel6" noResource="true"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="rawPanel">
@@ -307,8 +432,8 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="rawPanelToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
-                      <Component id="rawScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="rawPanelToolbar" alignment="0" pref="1000" max="32767" attributes="0"/>
+                      <Component id="rawScrollPane" alignment="0" pref="1000" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -316,7 +441,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="rawPanelToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="rawScrollPane" pref="882" max="32767" attributes="0"/>
+                          <Component id="rawScrollPane" pref="670" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -391,8 +516,13 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="analysisToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
-                      <Component id="analysisScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="analysisScrollPane" alignment="0" pref="988" max="32767" attributes="1"/>
+                              <Component id="analysisToolbar" alignment="1" pref="988" max="32767" attributes="1"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -400,7 +530,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="analysisToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="analysisScrollPane" pref="882" max="32767" attributes="0"/>
+                          <Component id="analysisScrollPane" pref="670" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -502,8 +632,8 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="chartToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
-                      <Component id="chartScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="chartToolbar" alignment="0" pref="1000" max="32767" attributes="0"/>
+                      <Component id="chartScrollPane" alignment="0" pref="1000" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -511,7 +641,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="chartToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chartScrollPane" pref="894" max="32767" attributes="0"/>
+                          <Component id="chartScrollPane" pref="682" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -631,12 +761,12 @@
                       <Layout>
                         <DimensionLayout dim="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <EmptySpace min="0" pref="1036" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="2735" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <EmptySpace min="0" pref="928" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="1168" max="32767" attributes="0"/>
                           </Group>
                         </DimensionLayout>
                       </Layout>
@@ -660,9 +790,9 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="testToolbar" alignment="0" pref="1048" max="32767" attributes="0"/>
-                      <Component id="testExperimentsScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
-                      <Component id="testResultsScrollPane" alignment="0" pref="1048" max="32767" attributes="0"/>
+                      <Component id="testToolbar" alignment="0" pref="1000" max="32767" attributes="0"/>
+                      <Component id="testExperimentsScrollPane" alignment="0" pref="1000" max="32767" attributes="0"/>
+                      <Component id="testResultsScrollPane" alignment="0" pref="1000" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -670,9 +800,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="testToolbar" min="-2" pref="25" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="testExperimentsScrollPane" pref="383" max="32767" attributes="0"/>
+                          <Component id="testExperimentsScrollPane" pref="277" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="128" max="-2" attributes="0"/>
-                          <Component id="testResultsScrollPane" pref="383" max="32767" attributes="0"/>
+                          <Component id="testResultsScrollPane" pref="277" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -850,11 +980,11 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="statusPanelSeparator" alignment="0" pref="1060" max="32767" attributes="0"/>
+              <Component id="statusPanelSeparator" alignment="0" pref="1446" max="32767" attributes="0"/>
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusMessageLabel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="876" max="32767" attributes="0"/>
+                  <EmptySpace pref="1262" max="32767" attributes="0"/>
                   <Component id="progressBar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusAnimationLabel" min="-2" max="-2" attributes="0"/>
@@ -910,12 +1040,6 @@
     <Property name="component" type="javax.swing.JComponent" editor="org.netbeans.modules.form.ComponentChooserEditor">
       <ComponentRef name="mainPanel"/>
     </Property>
-    <Property name="menuBar" type="javax.swing.JMenuBar" editor="org.netbeans.modules.form.ComponentChooserEditor">
-      <ComponentRef name="menuBar"/>
-    </Property>
-    <Property name="statusBar" type="javax.swing.JComponent" editor="org.netbeans.modules.form.ComponentChooserEditor">
-      <ComponentRef name="statusPanel"/>
-    </Property>
   </Properties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
@@ -927,6 +1051,6 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,4,0,0,0,4,36"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,3,0,0,0,4,0"/>
   </AuxValues>
 </Form>

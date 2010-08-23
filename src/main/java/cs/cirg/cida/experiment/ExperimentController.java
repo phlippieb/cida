@@ -23,8 +23,8 @@ package cs.cirg.cida.experiment;
 
 import cs.cirg.cida.CIDAView;
 import cs.cirg.cida.components.IOBridgeTableModel;
-import cs.cirg.cida.components.SynopsisTableModel;
 import cs.cirg.cida.exception.CIDAException;
+import cs.cirg.cida.exception.ExperimentNotFoundException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -34,11 +34,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import net.sourceforge.cilib.io.CSVFileWriter;
-import net.sourceforge.cilib.io.DataTable;
-import net.sourceforge.cilib.io.StandardDataTable;
 import net.sourceforge.cilib.io.exception.CIlibIOException;
-import net.sourceforge.cilib.type.types.Numeric;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
  *
@@ -55,6 +51,11 @@ public class ExperimentController {
         this.view = view;
         this.model = model;
         experimentTestController = new ExperimentTestController(view, new ExperimentTestModel());
+    }
+
+    public int getExperimentID(String experimentName) throws ExperimentNotFoundException
+    {
+        return model.getExperimentCollection().getExperiment(experimentName).getId();
     }
 
     public void addExperiments(File[] dataFiles, String[] experimentName) throws CIlibIOException {
@@ -85,72 +86,6 @@ public class ExperimentController {
         IOBridgeTableModel ioTableModel = new IOBridgeTableModel();
         ioTableModel.setDataTable(model.getActiveExperiment().getData());
         view.getRawTable().setModel(ioTableModel);
-    }
-
-    private List<? extends Numeric> trimList(List<? extends Numeric> list, int targetSize) {
-        int size = list.size();
-        for (int i = size - 1; i >= targetSize; i--) {
-            list.remove(i);
-        }
-        return list;
-    }
-
-    public void addVariableToAnalysisTable(String variableName, int selectedIterations) throws CIDAException {
-        IExperiment selectedExperiment = model.getActiveExperiment();
-        model.updateAnalysisName(selectedExperiment, variableName);
-
-        JTable analysisTable = view.getAnalysisTable();
-        DataTable analysisDataTable = ((IOBridgeTableModel) analysisTable.getModel()).getDataTable();
-
-        List<DescriptiveStatistics> statistics = selectedExperiment.getStatistics(variableName);
-
-        int iterationsToAdd = statistics.size();
-        if (selectedIterations != 0) {
-            if (selectedIterations < 0 || selectedIterations > iterationsToAdd) {
-                throw new CIDAException("Invalid number of iterations specified: " + iterationsToAdd);
-            }
-            iterationsToAdd = selectedIterations;
-        }
-
-        if (analysisDataTable.getNumColums() == 0) {
-            List<Numeric> iterations = selectedExperiment.getIterationColumn();
-
-            trimList(iterations, iterationsToAdd);
-            analysisDataTable.addColumn(iterations);
-            analysisDataTable.setColumnName(0, "Iterations");
-        }
-
-        try {
-            analysisDataTable.addColumn(trimList(selectedExperiment.getStatistic(variableName, VariableStatistic.Mean), iterationsToAdd));
-            analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, selectedExperiment.getName() + " " + variableName + " Mean");
-            analysisDataTable.addColumn(trimList(selectedExperiment.getStatistic(variableName, VariableStatistic.StdDev), iterationsToAdd));
-            analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, selectedExperiment.getName() + " " + variableName + " Std Dev");
-        } catch (UnsupportedOperationException ex) {
-            throw new CIDAException(ex.getMessage());
-        }
-
-        IOBridgeTableModel ioBridgeTable = new IOBridgeTableModel();
-        ioBridgeTable.setDataTable((StandardDataTable<Numeric>) analysisDataTable);
-        analysisTable.setModel(ioBridgeTable);
-
-        addVariableToSynopsisTable(variableName);
-    }
-
-    public void addVariableToSynopsisTable(String variableName) {
-        IExperiment selectedExperiment = model.getActiveExperiment();
-        JTable synopsisTable = view.getSynopsisTable();
-        SynopsisTableModel synopsisTableModel = (SynopsisTableModel) synopsisTable.getModel();
-
-        if (!synopsisTableModel.getVariables().contains(variableName)) {
-            synopsisTableModel.getVariables().add(variableName);
-        }
-
-        if (!synopsisTableModel.getExperiments().contains(selectedExperiment)) {
-            synopsisTableModel.getExperiments().add(selectedExperiment);
-        }
-
-        SynopsisTableModel newModel = new SynopsisTableModel(synopsisTableModel);
-        synopsisTable.setModel(newModel);
     }
 
     public void exportSynopsisTable(File file) {
@@ -248,6 +183,14 @@ public class ExperimentController {
 
     public void mannWhitneyUTest() {
         experimentTestController.mannWhitneyUTest();
+    }
+
+    public ExperimentAnalysisModel getModel() {
+        return model;
+    }
+
+    public void setModel(ExperimentAnalysisModel model) {
+        this.model = model;
     }
 
     public String getDataDirectory() {
