@@ -30,6 +30,7 @@ import cs.cirg.cida.components.SeriesPair;
 import cs.cirg.cida.exception.CIDAException;
 import cs.cirg.cida.experiment.ExperimentAnalysisModel;
 import cs.cirg.cida.experiment.ExperimentController;
+import cs.cirg.cida.experiment.TableConstructionController;
 import java.awt.Color;
 import java.awt.Paint;
 import javax.swing.JTable;
@@ -80,6 +81,7 @@ public class CIDAView extends FrameView {
 
     private ExceptionController exceptionController;
     private ExperimentController experimentController;
+    private TableConstructionController tableConstructionController;
     //private DataTableExperiment selectedExperiment;
     private List<Integer> userSelectedRows;
     private List<Integer> userSelectedColumns;
@@ -89,6 +91,7 @@ public class CIDAView extends FrameView {
 
         exceptionController = new ExceptionController();
         experimentController = new ExperimentController(this, new ExperimentAnalysisModel(((CIDAApplication) app).getStartupDirectory()));
+        tableConstructionController = new TableConstructionController(this, experimentController.getModel());
 
         userSelectedRows = new ArrayList<Integer>();
         userSelectedColumns = new ArrayList<Integer>();
@@ -153,6 +156,28 @@ public class CIDAView extends FrameView {
         });
     }
 
+    public int getIterationsToAdd() {
+        int selectedIterations = 0;
+        if (!addAllRowsCheckBox.isSelected()) {
+            CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Number of rows:", "" + selectedIterations);
+            dialog.displayPrompt();
+            selectedIterations = Integer.parseInt(dialog.getInput());
+        }
+        return selectedIterations;
+    }
+
+    public String getSelectedVariableName() throws CIDAException {
+        if (variablesComboBox.getSelectedItem() == null) {
+            throw new CIDAException("Selected item is null");
+        }
+        if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
+            throw new CIDAException("Variable box is empty");
+        }
+        String variableName = (String) variablesComboBox.getSelectedItem();
+        return variableName;
+
+    }
+
     @Action
     public void loadExperiment() {
         JFileChooser chooser = new JFileChooser(experimentController.getDataDirectory());
@@ -200,24 +225,14 @@ public class CIDAView extends FrameView {
     }
 
     @Action
-    public void addVariableToAnalysis() {
+    public void addVariableAnalysis() {
         try {
-            if (variablesComboBox.getSelectedItem() == null) {
-                throw new CIDAException("Selected item is null");
-            }
-            if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
-                throw new CIDAException("Variable box is empty");
-            }
-            String variableName = (String) variablesComboBox.getSelectedItem();
-
-            int selectedIterations = 0;
-            if (!addAllRowsCheckBox.isSelected()) {
-                CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Number of rows:", "" + selectedIterations);
-                dialog.displayPrompt();
-                selectedIterations = Integer.parseInt(dialog.getInput());
-            }
-            experimentController.addVariableToAnalysisTable(variableName, selectedIterations);
-        } catch (CIDAException ex) {
+            int experimentID = experimentController.getExperimentID((String) experimentsComboBox.getSelectedItem());
+            String variableName = getSelectedVariableName();
+            tableConstructionController.addDataToTables(TableConstructionController.Intent.ADD_ONE,
+                    TableConstructionController.Target.EXPERIMENT, experimentID,
+                    variableName, getIterationsToAdd());
+        } catch (Exception ex) {
             CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
             dialog.displayPrompt();
             return;
@@ -225,27 +240,15 @@ public class CIDAView extends FrameView {
     }
 
     @Action
-    public void addVariableToSynopsisTable() {
-        if (variablesComboBox.getSelectedItem() == null) {
-            return;
-        }
-        if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
-            return;
-        }
-
-        String variableName = (String) variablesComboBox.getSelectedItem();
-        experimentController.addVariableToSynopsisTable(variableName);
-    }
-
-    @Action
-    public void addAllToAnalysis() {
+    public void addAllExperimentsAnalysis()
+    {
         try {
-            int numVars = variablesComboBox.getItemCount();
-            for (int i = 0; i < numVars; i++) {
-                String variable = (String) variablesComboBox.getItemAt(i);
-                experimentController.addVariableToAnalysisTable(variable, 0);
-            }
-        } catch (CIDAException ex) {
+            int experimentID = experimentController.getExperimentID((String) experimentsComboBox.getSelectedItem());
+            String variableName = getSelectedVariableName();
+            tableConstructionController.addDataToTables(TableConstructionController.Intent.ADD_ALL,
+                    TableConstructionController.Target.EXPERIMENT, experimentID,
+                    variableName, getIterationsToAdd());
+        } catch (Exception ex) {
             CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
             dialog.displayPrompt();
             return;
@@ -253,11 +256,34 @@ public class CIDAView extends FrameView {
     }
 
     @Action
-    public void addAllToSynopsis() {
-        int numVars = variablesComboBox.getItemCount();
-        for (int i = 0; i < numVars; i++) {
-            String variable = (String) variablesComboBox.getItemAt(i);
-            experimentController.addVariableToSynopsisTable(variable);
+    public void addAllVariablesAnalysis()
+    {
+        try {
+            int experimentID = experimentController.getExperimentID((String) experimentsComboBox.getSelectedItem());
+            String variableName = getSelectedVariableName();
+            tableConstructionController.addDataToTables(TableConstructionController.Intent.ADD_ALL,
+                    TableConstructionController.Target.VARIABLE, experimentID,
+                    variableName, getIterationsToAdd());
+        } catch (Exception ex) {
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
+            return;
+        }
+    }
+
+    @Action
+    public void addAllAnalysis()
+    {
+        try {
+            int experimentID = experimentController.getExperimentID((String) experimentsComboBox.getSelectedItem());
+            String variableName = getSelectedVariableName();
+            tableConstructionController.addDataToTables(TableConstructionController.Intent.ADD_ALL,
+                    TableConstructionController.Target.EXPERIMENT_AND_VARIABLE, experimentID,
+                    variableName, getIterationsToAdd());
+        } catch (Exception ex) {
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            dialog.displayPrompt();
+            return;
         }
     }
 
@@ -295,6 +321,17 @@ public class CIDAView extends FrameView {
             CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
             dialog.displayPrompt();
             return;
+        }
+    }
+
+    @Action
+    public void exportSynopsisTable() {
+        JFileChooser chooser = new JFileChooser(experimentController.getDataDirectory());
+        //model.getActiveExperiment().getName() + ".csv"
+        chooser.setSelectedFile(new File("table.tex"));
+        int returnVal = chooser.showOpenDialog(this.getComponent());
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            experimentController.exportSynopsisTable(chooser.getSelectedFile());
         }
     }
 
@@ -533,8 +570,6 @@ public class CIDAView extends FrameView {
         mainPanel = new javax.swing.JPanel();
         testPanel = new javax.swing.JTabbedPane();
         homePanel = new javax.swing.JPanel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
         synopsisTable = new javax.swing.JTable();
         experimentsLabel = new javax.swing.JLabel();
@@ -544,11 +579,19 @@ public class CIDAView extends FrameView {
         addToTestButton = new javax.swing.JButton();
         variablesLabel = new javax.swing.JLabel();
         variablesComboBox = new javax.swing.JComboBox();
-        addToAnalysisButton = new javax.swing.JButton();
-        addToSynopsisButton = new javax.swing.JButton();
         addAllRowsCheckBox = new javax.swing.JCheckBox();
-        addAllVariablesAnalysisButton = new javax.swing.JButton();
-        addAllVariablesSynopsisButton = new javax.swing.JButton();
+        exportTableButton = new javax.swing.JButton();
+        addToAnalysisPanel = new javax.swing.JPanel();
+        addOneVariableAnalysis = new javax.swing.JButton();
+        addAllExperimentsAnalysis = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        addToAnalysisPanel1 = new javax.swing.JPanel();
+        addAllVariablesAnalysis = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        addToAnalysisPanel2 = new javax.swing.JPanel();
+        addAllAnalysis = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
         rawPanel = new javax.swing.JPanel();
         rawPanelToolbar = new javax.swing.JToolBar();
         exportDataButton = new javax.swing.JButton();
@@ -596,15 +639,14 @@ public class CIDAView extends FrameView {
         progressBar = new javax.swing.JProgressBar();
 
         mainPanel.setName("mainPanel"); // NOI18N
-        mainPanel.setPreferredSize(new java.awt.Dimension(1280, 1024));
+        mainPanel.setPreferredSize(new java.awt.Dimension(1024, 768));
 
+        testPanel.setAutoscrolls(true);
         testPanel.setName("testPanel"); // NOI18N
+        testPanel.setPreferredSize(new java.awt.Dimension(1024, 768));
 
+        homePanel.setAutoscrolls(true);
         homePanel.setName("homePanel"); // NOI18N
-
-        jSeparator1.setName("jSeparator1"); // NOI18N
-
-        jSeparator2.setName("jSeparator2"); // NOI18N
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
@@ -650,25 +692,106 @@ public class CIDAView extends FrameView {
 
         variablesComboBox.setName("variablesComboBox"); // NOI18N
 
-        addToAnalysisButton.setAction(actionMap.get("addVariableToAnalysis")); // NOI18N
-        addToAnalysisButton.setText(resourceMap.getString("addToAnalysisButton.text")); // NOI18N
-        addToAnalysisButton.setName("addToAnalysisButton"); // NOI18N
-
-        addToSynopsisButton.setAction(actionMap.get("addVariableToSynopsisTable")); // NOI18N
-        addToSynopsisButton.setText(resourceMap.getString("addToSynopsisButton.text")); // NOI18N
-        addToSynopsisButton.setName("addToSynopsisButton"); // NOI18N
-
         addAllRowsCheckBox.setSelected(true);
         addAllRowsCheckBox.setText(resourceMap.getString("addAllRowsCheckBox.text")); // NOI18N
         addAllRowsCheckBox.setName("addAllRowsCheckBox"); // NOI18N
 
-        addAllVariablesAnalysisButton.setAction(actionMap.get("addAllToAnalysis")); // NOI18N
-        addAllVariablesAnalysisButton.setText(resourceMap.getString("addAllVariablesAnalysisButton.text")); // NOI18N
-        addAllVariablesAnalysisButton.setName("addAllVariablesAnalysisButton"); // NOI18N
+        exportTableButton.setAction(actionMap.get("exportSynopsisTable")); // NOI18N
+        exportTableButton.setText(resourceMap.getString("exportTableButton.text")); // NOI18N
+        exportTableButton.setName("exportTableButton"); // NOI18N
 
-        addAllVariablesSynopsisButton.setAction(actionMap.get("addAllToSynopsis")); // NOI18N
-        addAllVariablesSynopsisButton.setText(resourceMap.getString("addAllVariablesSynopsisButton.text")); // NOI18N
-        addAllVariablesSynopsisButton.setName("addAllVariablesSynopsisButton"); // NOI18N
+        addToAnalysisPanel.setName("addToAnalysisPanel"); // NOI18N
+
+        addOneVariableAnalysis.setAction(actionMap.get("addVariableAnalysis")); // NOI18N
+        addOneVariableAnalysis.setText(resourceMap.getString("addOneVariableAnalysis.text")); // NOI18N
+        addOneVariableAnalysis.setName("addOneVariableAnalysis"); // NOI18N
+
+        addAllExperimentsAnalysis.setAction(actionMap.get("addAllExperimentsAnalysis")); // NOI18N
+        addAllExperimentsAnalysis.setText(resourceMap.getString("addAllExperimentsAnalysis.text")); // NOI18N
+        addAllExperimentsAnalysis.setName("addAllExperimentsAnalysis"); // NOI18N
+
+        jLabel5.setFont(resourceMap.getFont("jLabel5.font")); // NOI18N
+        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
+        jLabel5.setName("jLabel5"); // NOI18N
+
+        org.jdesktop.layout.GroupLayout addToAnalysisPanelLayout = new org.jdesktop.layout.GroupLayout(addToAnalysisPanel);
+        addToAnalysisPanel.setLayout(addToAnalysisPanelLayout);
+        addToAnalysisPanelLayout.setHorizontalGroup(
+            addToAnalysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(addToAnalysisPanelLayout.createSequentialGroup()
+                .add(addToAnalysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(addOneVariableAnalysis, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(addAllExperimentsAnalysis, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        addToAnalysisPanelLayout.setVerticalGroup(
+            addToAnalysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(addToAnalysisPanelLayout.createSequentialGroup()
+                .add(jLabel5)
+                .add(8, 8, 8)
+                .add(addToAnalysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(addOneVariableAnalysis, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(addAllExperimentsAnalysis, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+        );
+
+        addToAnalysisPanel1.setName("addToAnalysisPanel1"); // NOI18N
+
+        addAllVariablesAnalysis.setAction(actionMap.get("addAllVariablesAnalysis")); // NOI18N
+        addAllVariablesAnalysis.setText(resourceMap.getString("addAllVariablesAnalysis.text")); // NOI18N
+        addAllVariablesAnalysis.setName("addAllVariablesAnalysis"); // NOI18N
+
+        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
+
+        org.jdesktop.layout.GroupLayout addToAnalysisPanel1Layout = new org.jdesktop.layout.GroupLayout(addToAnalysisPanel1);
+        addToAnalysisPanel1.setLayout(addToAnalysisPanel1Layout);
+        addToAnalysisPanel1Layout.setHorizontalGroup(
+            addToAnalysisPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(addToAnalysisPanel1Layout.createSequentialGroup()
+                .add(jLabel4)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(addAllVariablesAnalysis, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+        );
+        addToAnalysisPanel1Layout.setVerticalGroup(
+            addToAnalysisPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(addToAnalysisPanel1Layout.createSequentialGroup()
+                .add(jLabel4)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(addAllVariablesAnalysis, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel3.setFont(resourceMap.getFont("jLabel3.font")); // NOI18N
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+
+        addToAnalysisPanel2.setName("addToAnalysisPanel2"); // NOI18N
+
+        addAllAnalysis.setAction(actionMap.get("addAllAnalysis")); // NOI18N
+        addAllAnalysis.setText(resourceMap.getString("addAllAnalysis.text")); // NOI18N
+        addAllAnalysis.setName("addAllAnalysis"); // NOI18N
+
+        jLabel6.setText(resourceMap.getString("jLabel6.text")); // NOI18N
+        jLabel6.setName("jLabel6"); // NOI18N
+
+        org.jdesktop.layout.GroupLayout addToAnalysisPanel2Layout = new org.jdesktop.layout.GroupLayout(addToAnalysisPanel2);
+        addToAnalysisPanel2.setLayout(addToAnalysisPanel2Layout);
+        addToAnalysisPanel2Layout.setHorizontalGroup(
+            addToAnalysisPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(addToAnalysisPanel2Layout.createSequentialGroup()
+                .add(addToAnalysisPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel6)
+                    .add(addAllAnalysis))
+                .addContainerGap(95, Short.MAX_VALUE))
+        );
+        addToAnalysisPanel2Layout.setVerticalGroup(
+            addToAnalysisPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(addToAnalysisPanel2Layout.createSequentialGroup()
+                .add(jLabel6)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(addAllAnalysis, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         org.jdesktop.layout.GroupLayout homePanelLayout = new org.jdesktop.layout.GroupLayout(homePanel);
         homePanel.setLayout(homePanelLayout);
@@ -677,65 +800,68 @@ public class CIDAView extends FrameView {
             .add(homePanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jSeparator2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1036, Short.MAX_VALUE)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 976, Short.MAX_VALUE)
                     .add(homePanelLayout.createSequentialGroup()
-                        .add(variablesLabel)
-                        .add(18, 18, 18)
-                        .add(variablesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 350, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                            .add(homePanelLayout.createSequentialGroup()
+                                .add(variablesLabel)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(variablesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 341, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, homePanelLayout.createSequentialGroup()
+                                .add(experimentsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 348, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                    .add(homePanelLayout.createSequentialGroup()
+                                        .add(18, 18, 18)
+                                        .add(addToTestButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .add(homePanelLayout.createSequentialGroup()
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(loadExperimentButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(addToSynopsisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(addAllVariablesAnalysisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(addAllVariablesSynopsisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, addToAnalysisButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(editResultsNameCheckBox)
+                            .add(jLabel3)
+                            .add(addToAnalysisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(exportTableButton)
+                            .add(addToAnalysisPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(addToAnalysisPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addAllRowsCheckBox))
-                    .add(homePanelLayout.createSequentialGroup()
-                        .add(experimentsLabel)
-                        .add(62, 62, 62)
-                        .add(experimentsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 348, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, addToTestButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, loadExperimentButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(editResultsNameCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 184, Short.MAX_VALUE)))
+                    .add(experimentsLabel))
                 .addContainerGap())
         );
         homePanelLayout.setVerticalGroup(
             homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(homePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(experimentsLabel)
-                    .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(loadExperimentButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(editResultsNameCheckBox)
-                        .add(experimentsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(addToTestButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(139, 139, 139)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(homePanelLayout.createSequentialGroup()
+                        .add(experimentsLabel)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(editResultsNameCheckBox)
+                            .add(experimentsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(loadExperimentButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(addToTestButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(variablesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(variablesLabel)
+                            .add(jLabel3))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(addToAnalysisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(12, 12, 12))
+                    .add(homePanelLayout.createSequentialGroup()
+                        .add(addAllRowsCheckBox)
+                        .add(18, 18, 18)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(variablesLabel)
-                    .add(homePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(variablesComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(addToAnalysisButton)
-                        .add(addAllRowsCheckBox)))
+                .add(addToAnalysisPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(addToSynopsisButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(addAllVariablesAnalysisButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(addAllVariablesSynopsisButton)
-                .add(51, 51, 51)
-                .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+                .add(addToAnalysisPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(18, 18, 18)
+                .add(exportTableButton)
+                .add(18, 18, 18)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -768,15 +894,15 @@ public class CIDAView extends FrameView {
         rawPanel.setLayout(rawPanelLayout);
         rawPanelLayout.setHorizontalGroup(
             rawPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(rawPanelToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
-            .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(rawPanelToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+            .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
         );
         rawPanelLayout.setVerticalGroup(
             rawPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(rawPanelLayout.createSequentialGroup()
                 .add(rawPanelToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 886, Short.MAX_VALUE)
+                .add(rawScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -831,15 +957,18 @@ public class CIDAView extends FrameView {
         analysisPanel.setLayout(analysisPanelLayout);
         analysisPanelLayout.setHorizontalGroup(
             analysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(analysisToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
-            .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, analysisPanelLayout.createSequentialGroup()
+                .add(analysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 988, Short.MAX_VALUE)
+                    .add(analysisToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 988, Short.MAX_VALUE))
+                .addContainerGap())
         );
         analysisPanelLayout.setVerticalGroup(
             analysisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(analysisPanelLayout.createSequentialGroup()
                 .add(analysisToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 886, Short.MAX_VALUE)
+                .add(analysisScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -912,11 +1041,11 @@ public class CIDAView extends FrameView {
         chartPanel.setLayout(chartPanelLayout);
         chartPanelLayout.setHorizontalGroup(
             chartPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 1036, Short.MAX_VALUE)
+            .add(0, 2735, Short.MAX_VALUE)
         );
         chartPanelLayout.setVerticalGroup(
             chartPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 928, Short.MAX_VALUE)
+            .add(0, 1168, Short.MAX_VALUE)
         );
 
         chartScrollPane.setViewportView(chartPanel);
@@ -925,15 +1054,15 @@ public class CIDAView extends FrameView {
         chartHomePanel.setLayout(chartHomePanelLayout);
         chartHomePanelLayout.setHorizontalGroup(
             chartHomePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(chartToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
-            .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(chartToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+            .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
         );
         chartHomePanelLayout.setVerticalGroup(
             chartHomePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(chartHomePanelLayout.createSequentialGroup()
                 .add(chartToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 898, Short.MAX_VALUE))
+                .add(chartScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 682, Short.MAX_VALUE))
         );
 
         testPanel.addTab(resourceMap.getString("chartHomePanel.TabConstraints.tabTitle"), chartHomePanel); // NOI18N
@@ -988,18 +1117,18 @@ public class CIDAView extends FrameView {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(testToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
-            .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
-            .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .add(testToolbar, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+            .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
+            .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1000, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(testToolbar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                .add(testExperimentsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
                 .add(128, 128, 128)
-                .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
+                .add(testResultsScrollPane, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
         );
 
         testPanel.addTab(resourceMap.getString("jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
@@ -1008,11 +1137,15 @@ public class CIDAView extends FrameView {
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1060, Short.MAX_VALUE)
+            .add(mainPanelLayout.createSequentialGroup()
+                .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1012, Short.MAX_VALUE)
+                .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE)
+            .add(mainPanelLayout.createSequentialGroup()
+                .add(testPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 756, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -1048,11 +1181,11 @@ public class CIDAView extends FrameView {
         statusPanel.setLayout(statusPanelLayout);
         statusPanelLayout.setHorizontalGroup(
             statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1060, Short.MAX_VALUE)
+            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1446, Short.MAX_VALUE)
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 878, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 1262, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -1071,19 +1204,20 @@ public class CIDAView extends FrameView {
         );
 
         setComponent(mainPanel);
-        setMenuBar(menuBar);
-        setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
 
     private void experimentsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_experimentsComboBoxActionPerformed
         this.selectExperiment();
     }//GEN-LAST:event_experimentsComboBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton addAllAnalysis;
+    private javax.swing.JButton addAllExperimentsAnalysis;
     private javax.swing.JCheckBox addAllRowsCheckBox;
-    private javax.swing.JButton addAllVariablesAnalysisButton;
-    private javax.swing.JButton addAllVariablesSynopsisButton;
-    private javax.swing.JButton addToAnalysisButton;
-    private javax.swing.JButton addToSynopsisButton;
+    private javax.swing.JButton addAllVariablesAnalysis;
+    private javax.swing.JButton addOneVariableAnalysis;
+    private javax.swing.JPanel addToAnalysisPanel;
+    private javax.swing.JPanel addToAnalysisPanel1;
+    private javax.swing.JPanel addToAnalysisPanel2;
     private javax.swing.JButton addToTestButton;
     private javax.swing.JPanel analysisPanel;
     private javax.swing.JScrollPane analysisScrollPane;
@@ -1101,14 +1235,17 @@ public class CIDAView extends FrameView {
     private javax.swing.JButton exportDataButton;
     private javax.swing.JButton exportEPSButton;
     private javax.swing.JButton exportPNGButton;
+    private javax.swing.JButton exportTableButton;
     private javax.swing.JPanel homePanel;
     private javax.swing.JComboBox hypothesisComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JComboBox lineSeriesComboBox;
     private javax.swing.JTextField lineTickIntervalInput;
     private javax.swing.JLabel lineTickIntervalLabel;

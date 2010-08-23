@@ -42,15 +42,8 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
     }
 
     @Override
-    public boolean hasNextRow() throws CIlibIOException {
-        if (firstDataLine != null) {
-            return true;
-        }
-        return super.hasNextRow();
-    }
-
-    @Override
     public List<Type> nextRow() {
+
         String line = null;
         if (firstDataLine != null) {
             line = firstDataLine;
@@ -63,10 +56,15 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
         row.add(new Int(Integer.parseInt(types[0])));
         for (int i = 1; i < types.length; i++) {
             if (!types[i].isEmpty()) {
-                row.add(new Real(Double.parseDouble(types[i])));
+                try {
+                    row.add(new Real(Double.parseDouble(types[i])));
+                } catch (NumberFormatException ex) {
+                    row.add(row.get(i-1));
+                }
             }
         }
         return row;
+
     }
 
     @Override
@@ -79,6 +77,7 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
         while (line.charAt(0) == '#') {
             int seperatorIndex = line.indexOf('-');
             int column = Integer.parseInt(line.substring(1, seperatorIndex - 1).trim());
+
             String columnName = line.substring(seperatorIndex + 2).trim();
             columnNames.add(columnName);
             line = this.nextLine();

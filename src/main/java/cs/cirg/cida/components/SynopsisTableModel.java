@@ -19,7 +19,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida.components;
 
 import cs.cirg.cida.experiment.DataTableExperiment;
@@ -53,7 +52,7 @@ public class SynopsisTableModel extends AbstractTableModel {
     }
 
     public int getColumnCount() {
-        return variables.size()*2 + 1;
+        return variables.size() * 2 + 1;
     }
 
     @Override
@@ -86,6 +85,22 @@ public class SynopsisTableModel extends AbstractTableModel {
 
     public void setExperiments(List<IExperiment> experiments) {
         this.experiments = experiments;
+    }
+
+    public boolean addVariable(String variableName) {
+        if (!this.getVariables().contains(variableName)) {
+            this.getVariables().add(variableName);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addExperiment(IExperiment experiment) {
+        if (!this.getExperiments().contains(experiment)) {
+            this.getExperiments().add(experiment);
+            return true;
+        }
+        return false;
     }
 
     public List<String> getVariables() {
