@@ -21,6 +21,7 @@
  */
 package cs.cirg.cida.experiment;
 
+import cs.cirg.cida.CIDAConstants;
 import cs.cirg.cida.exception.CIDAException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,7 @@ public class ExperimentTestModel {
                 experiment = exp;
         }
         if (experiment == null) {
-            throw new CIDAException("Experiment not found: "+experimentName);
+            throw new CIDAException(CIDAConstants.EXCEPTION_EXPERIMENT_NOT_FOUND+experimentName);
         }
         return experiment;
     }

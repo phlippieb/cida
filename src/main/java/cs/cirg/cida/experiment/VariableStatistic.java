@@ -19,13 +19,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
 package cs.cirg.cida.experiment;
 
 import java.util.ArrayList;
 import java.util.List;
 import net.sourceforge.cilib.type.types.Real;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.descriptive.rank.Median;
 
 /**
  *
@@ -44,7 +44,20 @@ public enum VariableStatistic {
             return statList;
         }
     },
+    Median {
+
+        @Override
+        public List<Real> getStatistic(List<DescriptiveStatistics> stats) {
+            int size = stats.size();
+            List<Real> statList = new ArrayList<Real>(size);
+            for (int i = 0; i < size; i++) {
+                statList.add(new Real(stats.get(i).apply(new Median())));
+            }
+            return statList;
+        }
+    },
     StdDev {
+
         @Override
         public List<Real> getStatistic(List<DescriptiveStatistics> stats) {
             int size = stats.size();

@@ -21,6 +21,7 @@
  */
 package cs.cirg.cida.experiment;
 
+import cs.cirg.cida.CIDAConstants;
 import cs.cirg.cida.CIDAView;
 import cs.cirg.cida.components.IOBridgeTableModel;
 import cs.cirg.cida.components.SynopsisTableModel;
@@ -57,6 +58,12 @@ public class TableConstructionController {
         cidaView = cv;
     }
 
+    private void addStatistic(IExperiment experiment, DataTable analysisDataTable,
+            VariableStatistic statistic, String variableName, int rows) {
+        analysisDataTable.addColumn(Util.trimList(experiment.getStatistic(variableName, statistic), rows));
+        analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, experiment.getName() + " " + variableName + " " + statistic);
+    }
+
     protected void resolveAddOneIntent(IExperiment experiment, String variableName, int rowsProposed,
             DataTable analysisDataTable, SynopsisTableModel synopsisTableModel)
             throws CIDAException {
@@ -65,10 +72,9 @@ public class TableConstructionController {
         setupEmptyAnalysisTable(analysisDataTable, experiment, rows);
 
         try {
-            analysisDataTable.addColumn(Util.trimList(experiment.getStatistic(variableName, VariableStatistic.Mean), rows));
-            analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, experiment.getName() + " " + variableName + " Mean");
-            analysisDataTable.addColumn(Util.trimList(experiment.getStatistic(variableName, VariableStatistic.StdDev), rows));
-            analysisDataTable.setColumnName(analysisDataTable.getNumColums() - 1, experiment.getName() + " " + variableName + " Std Dev");
+            addStatistic(experiment, analysisDataTable, VariableStatistic.Mean, variableName, rows);
+            addStatistic(experiment, analysisDataTable, VariableStatistic.Median, variableName, rows);
+            addStatistic(experiment, analysisDataTable, VariableStatistic.StdDev, variableName, rows);
 
             synopsisTableModel.addExperiment(experiment);
             synopsisTableModel.addVariable(variableName);
@@ -131,7 +137,7 @@ public class TableConstructionController {
             List<Numeric> iterations = experiment.getIterationColumn();
             Util.trimList(iterations, rows);
             table.addColumn(iterations);
-            table.setColumnName(0, "Iterations");
+            table.setColumnName(0, CIDAConstants.TABLE_ITERATIONS_LABEL);
         }
     }
 }

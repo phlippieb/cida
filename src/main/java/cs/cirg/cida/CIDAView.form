@@ -124,10 +124,7 @@
                                   <Component id="addToAnalysisPanel" min="-2" max="-2" attributes="1"/>
                                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="addAllRowsCheckBox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="addAllRowsCheckBox" alignment="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="addToAnalysisPanel1" min="-2" max="-2" attributes="1"/>
@@ -136,7 +133,7 @@
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="exportTableButton" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="306" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="300" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -208,6 +205,7 @@
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="editResultsNameCheckBox">
                   <Properties>
+                    <Property name="selected" type="boolean" value="true"/>
                     <Property name="text" type="java.lang.String" resourceKey="editResultsNameCheckBox.text"/>
                     <Property name="name" type="java.lang.String" value="editResultsNameCheckBox" noResource="true"/>
                   </Properties>

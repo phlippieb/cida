@@ -21,6 +21,7 @@
  */
 package cs.cirg.cida.experiment;
 
+import cs.cirg.cida.CIDAConstants;
 import cs.cirg.cida.CIDAView;
 import cs.cirg.cida.components.IOBridgeTableModel;
 import cs.cirg.cida.exception.CIDAException;
@@ -160,16 +161,15 @@ public class ExperimentController {
     }
 
     public void exportRawTable() throws CIlibIOException {
-        exportTable(view.getRawTable(), model.getActiveExperiment().getName() + "_raw.csv");
+        exportTable(view.getRawTable(), model.getActiveExperiment().getName() + CIDAConstants.DEFAULT_RAW_FILE_NAME + CIDAConstants.EXT_CSV);
     }
 
     public void exportAnalysisTable() throws CIlibIOException {
-        exportTable(view.getAnalysisTable(), model.getAnalysisName() + ".csv");
+        exportTable(view.getAnalysisTable(), model.getAnalysisName() + CIDAConstants.EXT_CSV);
     }
 
     public void exportTable(JTable table, String filename) throws CIlibIOException {
         JFileChooser chooser = new JFileChooser(model.getDataDirectory());
-        //model.getActiveExperiment().getName() + ".csv"
         chooser.setSelectedFile(new File(filename));
         int returnVal = chooser.showOpenDialog(view.getComponent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {

@@ -21,12 +21,12 @@
  */
 package cs.cirg.cida.components;
 
-import cs.cirg.cida.experiment.DataTableExperiment;
 import cs.cirg.cida.experiment.IExperiment;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math.stat.descriptive.rank.Median;
 
 /**
  *
@@ -52,7 +52,7 @@ public class SynopsisTableModel extends AbstractTableModel {
     }
 
     public int getColumnCount() {
-        return variables.size() * 2 + 1;
+        return variables.size() * 3 + 1;
     }
 
     @Override
@@ -60,10 +60,13 @@ public class SynopsisTableModel extends AbstractTableModel {
         if (column == 0) {
             return "";
         }
-        if (column % 2 != 0) {
-            return variables.get(column / 2) + " Mean";
+        if (column % 3 == 1) {
+            return variables.get((column-1) / 3) + " Mean";
         }
-        return variables.get(column / 2 - 1) + " StdDev";
+        if (column % 3 == 2) {
+            return variables.get((column-1) / 3) + " Median";
+        }
+        return variables.get((column-1) / 3) + " StdDev";
     }
 
     @Override
@@ -71,11 +74,15 @@ public class SynopsisTableModel extends AbstractTableModel {
         if (columnIndex == 0) {
             return experiments.get(rowIndex).getName();
         }
-        if (columnIndex % 2 != 0) {
-            DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getBottomRowStatistics(variables.get(columnIndex / 2));
+        if (columnIndex % 3 == 1) {
+            DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getBottomRowStatistics(variables.get((columnIndex-1) / 3));
             return descriptiveStatistics.getMean();
         }
-        DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getBottomRowStatistics(variables.get(columnIndex / 2 - 1));
+        if (columnIndex % 3 == 2) {
+            DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getBottomRowStatistics(variables.get((columnIndex-1) / 3));
+            return descriptiveStatistics.apply(new Median());
+        }
+        DescriptiveStatistics descriptiveStatistics = experiments.get(rowIndex).getBottomRowStatistics(variables.get((columnIndex-1) / 3));
         return descriptiveStatistics.getStandardDeviation();
     }
 

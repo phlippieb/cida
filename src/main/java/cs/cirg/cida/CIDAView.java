@@ -159,7 +159,7 @@ public class CIDAView extends FrameView {
     public int getIterationsToAdd() {
         int selectedIterations = 0;
         if (!addAllRowsCheckBox.isSelected()) {
-            CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Number of rows:", "" + selectedIterations);
+            CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), CIDAConstants.DIALOG_NUM_ROWS_MSG, Integer.toString(selectedIterations));
             dialog.displayPrompt();
             selectedIterations = Integer.parseInt(dialog.getInput());
         }
@@ -168,10 +168,10 @@ public class CIDAView extends FrameView {
 
     public String getSelectedVariableName() throws CIDAException {
         if (variablesComboBox.getSelectedItem() == null) {
-            throw new CIDAException("Selected item is null");
+            throw new CIDAException(CIDAConstants.EXCEPTION_SELECTED_ITEM_NULL);
         }
         if (((String) variablesComboBox.getSelectedItem()).isEmpty()) {
-            throw new CIDAException("Variable box is empty");
+            throw new CIDAException(CIDAConstants.EXCEPTION_VARIABLE_BOX_EMPTY);
         }
         String variableName = (String) variablesComboBox.getSelectedItem();
         return variableName;
@@ -182,7 +182,7 @@ public class CIDAView extends FrameView {
     public void loadExperiment() {
         JFileChooser chooser = new JFileChooser(experimentController.getDataDirectory());
         FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                "Text and CSV files", "txt", "csv");
+                CIDAConstants.DIALOG_TXT_CSV_MSG, "txt", "csv");
         chooser.setFileFilter(filter);
         chooser.setMultiSelectionEnabled(true);
         int returnVal = chooser.showOpenDialog(this.getComponent());
@@ -195,7 +195,7 @@ public class CIDAView extends FrameView {
                     File dataFile = files[i];
                     String tmpName = dataFile.getName().substring(0, dataFile.getName().lastIndexOf("."));
                     if (editResultsNameCheckBox.isSelected()) {
-                        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Rename experiment:", tmpName);
+                        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), CIDAConstants.RENAME_EXPERIMENT_MSG, tmpName);
                         dialog.displayPrompt();
                         tmpName = dialog.getInput();
                     }
@@ -204,7 +204,7 @@ public class CIDAView extends FrameView {
                 experimentController.addExperiments(files, experimentNames);
                 this.selectExperiment();
             } catch (CIlibIOException ex) {
-                CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+                CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
                 dialog.displayPrompt();
             }
         }
@@ -219,7 +219,7 @@ public class CIDAView extends FrameView {
         try {
             experimentController.setActiveExperiment(selectedExperimentName);
         } catch (CIDAException ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
             dialog.displayPrompt();
         }
     }
@@ -233,7 +233,7 @@ public class CIDAView extends FrameView {
                     TableConstructionController.Target.EXPERIMENT, experimentID,
                     variableName, getIterationsToAdd());
         } catch (Exception ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
             dialog.displayPrompt();
             return;
         }
@@ -249,7 +249,7 @@ public class CIDAView extends FrameView {
                     TableConstructionController.Target.EXPERIMENT, experimentID,
                     variableName, getIterationsToAdd());
         } catch (Exception ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
             dialog.displayPrompt();
             return;
         }
@@ -265,7 +265,7 @@ public class CIDAView extends FrameView {
                     TableConstructionController.Target.VARIABLE, experimentID,
                     variableName, getIterationsToAdd());
         } catch (Exception ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
             dialog.displayPrompt();
             return;
         }
@@ -281,7 +281,7 @@ public class CIDAView extends FrameView {
                     TableConstructionController.Target.EXPERIMENT_AND_VARIABLE, experimentID,
                     variableName, getIterationsToAdd());
         } catch (Exception ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
             dialog.displayPrompt();
             return;
         }
@@ -307,7 +307,7 @@ public class CIDAView extends FrameView {
         try {
             experimentController.exportRawTable();
         } catch (CIlibIOException ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
             dialog.displayPrompt();
             return;
         }
@@ -318,7 +318,7 @@ public class CIDAView extends FrameView {
         try {
             experimentController.exportAnalysisTable();
         } catch (CIlibIOException ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.EXCEPTION_OCCURRED);
             dialog.displayPrompt();
             return;
         }
@@ -328,7 +328,7 @@ public class CIDAView extends FrameView {
     public void exportSynopsisTable() {
         JFileChooser chooser = new JFileChooser(experimentController.getDataDirectory());
         //model.getActiveExperiment().getName() + ".csv"
-        chooser.setSelectedFile(new File("table.tex"));
+        chooser.setSelectedFile(new File(CIDAConstants.DEFAULT_TABLE_NAME));
         int returnVal = chooser.showOpenDialog(this.getComponent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             experimentController.exportSynopsisTable(chooser.getSelectedFile());
@@ -368,9 +368,14 @@ public class CIDAView extends FrameView {
             lineSeriesComboBox.addItem(new SeriesPair(i, (String) series.getKey()));
         }
 
-        JFreeChart chart = ChartFactory.createXYLineChart(experimentController.getAnalysisName(), // Title
-                "Iterations", // X-Axis label
-                "Value", // Y-Axis label
+        String chartName = experimentController.getAnalysisName();
+        if (chartName.compareTo("") == 0)
+        {
+            chartName = CIDAConstants.DEFAULT_CHART_NAME;
+        }
+        JFreeChart chart = ChartFactory.createXYLineChart(chartName, // Title
+                CIDAConstants.CHART_ITERATIONS_LABEL, // X-Axis label
+                CIDAConstants.CHART_VALUE_LABEL, // Y-Axis label
                 xySeriesCollection, // Dataset
                 PlotOrientation.VERTICAL,
                 true, // Show legend,
@@ -429,7 +434,8 @@ public class CIDAView extends FrameView {
         JFreeChart chart = ((ChartPanel) chartPanel).getChart();
         XYPlot plot = (XYPlot) chart.getPlot();
         XYSeriesCollection xYSeriesCollection = (XYSeriesCollection) plot.getDataset();
-        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), "Enter new name: ", (String) xYSeriesCollection.getSeries(series.getValue()).getKey());
+        CIDAInputDialog dialog = new CIDAInputDialog(this.getFrame(), CIDAConstants.DIALOG_NEW_NAME_MSG,
+                (String) xYSeriesCollection.getSeries(series.getValue()).getKey());
         dialog.displayPrompt();
         xYSeriesCollection.getSeries(series.getValue()).setKey(dialog.getInput());
         plot.notifyListeners(new PlotChangeEvent(plot));
@@ -444,7 +450,7 @@ public class CIDAView extends FrameView {
         XYPlot plot = (XYPlot) chart.getPlot();
         XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
         renderer.setSeriesPaint(series.getKey(), JColorChooser.showDialog(this.getFrame(),
-                "Choose color",
+                CIDAConstants.DIALOG_CHOOSE_COLOR_MSG,
                 (Color) renderer.getSeriesPaint(series.getKey())));
     }
 
@@ -454,16 +460,18 @@ public class CIDAView extends FrameView {
         String name = chartToSave.getTitle().getText();
         name = name.trim().replaceAll(" ", "");
         try {
-            OutputStream out = new FileOutputStream(name + ".eps");
+            OutputStream out = new FileOutputStream(name + CIDAConstants.EXT_EPS);
             EPSDocumentGraphics2D g2d = new EPSDocumentGraphics2D(false);
             g2d.setGraphicContext(new GraphicContext());
 
-            g2d.setupDocument(out, 800, 600);
-            chartToSave.draw(g2d, new Rectangle2D.Double(0, 0, 800, 600));
+            g2d.setupDocument(out, CIDAConstants.DEFAULT_CHART_HORIZONTAL_RES,
+                    CIDAConstants.DEFAULT_CHART_VERTICAL_RES);
+            chartToSave.draw(g2d, new Rectangle2D.Double(0, 0, CIDAConstants.DEFAULT_CHART_HORIZONTAL_RES,
+                    CIDAConstants.DEFAULT_CHART_VERTICAL_RES));
 
             g2d.finish();
         } catch (IOException ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.DIALOG_NEW_NAME_MSG);
             dialog.displayPrompt();
         }
     }
@@ -474,9 +482,10 @@ public class CIDAView extends FrameView {
         String name = chartToSave.getTitle().getText();
         name = name.trim().replaceAll(" ", "");
         try {
-            ChartUtilities.saveChartAsPNG(new File(name + ".png"), chartToSave, 800, 600);
+            ChartUtilities.saveChartAsPNG(new File(name + CIDAConstants.EXT_PNG), chartToSave, CIDAConstants.DEFAULT_CHART_HORIZONTAL_RES,
+                    CIDAConstants.DEFAULT_CHART_VERTICAL_RES);
         } catch (IOException ex) {
-            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, "An Exception has occured: ");
+            CIDAPromptDialog dialog = exceptionController.handleException(this.getFrame(), ex, CIDAConstants.DIALOG_NEW_NAME_MSG);
             dialog.displayPrompt();
         }
     }
@@ -677,6 +686,7 @@ public class CIDAView extends FrameView {
             }
         });
 
+        editResultsNameCheckBox.setSelected(true);
         editResultsNameCheckBox.setText(resourceMap.getString("editResultsNameCheckBox.text")); // NOI18N
         editResultsNameCheckBox.setName("editResultsNameCheckBox"); // NOI18N
 
@@ -851,9 +861,7 @@ public class CIDAView extends FrameView {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(addToAnalysisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(12, 12, 12))
-                    .add(homePanelLayout.createSequentialGroup()
-                        .add(addAllRowsCheckBox)
-                        .add(18, 18, 18)))
+                    .add(addAllRowsCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(addToAnalysisPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
@@ -861,7 +869,7 @@ public class CIDAView extends FrameView {
                 .add(18, 18, 18)
                 .add(exportTableButton)
                 .add(18, 18, 18)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
