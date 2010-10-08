@@ -56,11 +56,11 @@ public class CIlibOutputReader extends FileReader<List<Type>> {
         row.add(new Int(Integer.parseInt(types[0])));
         for (int i = 1; i < types.length; i++) {
             if (!types[i].isEmpty()) {
-                try {
-                    row.add(new Real(Double.parseDouble(types[i])));
-                } catch (NumberFormatException ex) {
-                    row.add(row.get(i-1));
-                }
+                //try {
+                row.add(new Real(Double.parseDouble(types[i])));
+                //} catch (NumberFormatException ex) {
+                //    row.add(row.get(i-1));
+                //}
             }
         }
         return row;

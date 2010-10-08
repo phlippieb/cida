@@ -54,8 +54,7 @@ public class ExperimentController {
         experimentTestController = new ExperimentTestController(view, new ExperimentTestModel());
     }
 
-    public int getExperimentID(String experimentName) throws ExperimentNotFoundException
-    {
+    public int getExperimentID(String experimentName) throws ExperimentNotFoundException {
         return model.getExperimentCollection().getExperiment(experimentName).getId();
     }
 
@@ -108,7 +107,7 @@ public class ExperimentController {
             writer.write("\\hline\\hline\n");
             //writer.write("{\\bf " + synopsisTable.getModel().getColumnName(0) + "}");
             writer.write("{\\bf Problem}");
-            for (int i = 1; i < numCols; i += 2) {
+            for (int i = 1; i < numCols; i ++) {
                 writer.write(" & {\\bf " + synopsisTable.getModel().getColumnName(i) + "}");
             }
             writer.write("\\\\\n");
@@ -121,20 +120,12 @@ public class ExperimentController {
                     value = formatter.format(value);
                 }
                 writer.write(value.toString() + "\t");
-                for (int j = 1; j < numCols; j += 2) {
-                    //means
+                for (int j = 1; j < numCols; j++) {
                     value = synopsisTable.getModel().getValueAt(i, j);
                     if (value instanceof Number) {
                         value = formatter.format(value);
                     }
                     writer.write("\t&\t" + value.toString());
-
-                    //stddevs
-                    value = synopsisTable.getModel().getValueAt(i, j + 1);
-                    if (value instanceof Number) {
-                        value = formatter.format(value);
-                    }
-                    writer.write(" (" + value.toString() + ")");
                 }
                 writer.write("\\\\\n");
                 writer.write("\\hline\n");
